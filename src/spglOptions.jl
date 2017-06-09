@@ -56,6 +56,45 @@ Arguments not specified will be set to their default values. See the spglOptions
 for info regarding argument types.\n
 #########################################################################################\n
 
+    spgl_setparms(;fid = 1,
+                    verbosity = 3,
+                    iterations = 100000,
+                    nPrevVals = 10,
+                    bpTol = 1e-6,
+                    lsTol = 1e-6,
+                    optTol = 1e-4,
+                    decTol = 1e-4,
+                    stepMin = 1e-16,
+                    stepMax = 1e+5,
+                    rootMethod = 2,
+                    activeSetIt = Inf,
+                    subspaceMin = false,
+                    iscomplex = false,
+                    maxMatvec = Inf,
+                    weights = 1,
+                    quitPareto = false,
+                    minPareto = 3,
+                    lineSrchIt = 1,
+                    feasSrchIt = 10000,
+                    ignorePErr = false,
+                    project = dummyfun,
+                    primal_norm = dummyfun,
+                    dual_norm = dummyfun,
+                    funPenalty = dummyfun,
+                    proxy = false,
+                    linear = false,
+                    restore = false)
+
+# Examples 
+```julia
+# Default Options
+julia> opts = spgl_setparms()
+
+# Make optional changes
+julia> opts = spgl_setparms(verbosity = 1, iterations = 20000)
+```
+
+
 Arguments:\n
     |___Field____||__Type__||_____________________Description____________________________|\n
     fid          |Integer|   ..... File ID for output\n
