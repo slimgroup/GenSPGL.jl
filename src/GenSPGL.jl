@@ -1,5 +1,8 @@
+"""
+Julia port of MPF's SPGL1
+"""
 module GenSPGL
 
-# package code goes here
+include("spglOptions.jl")
 
 end # module
