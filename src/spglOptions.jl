@@ -1,10 +1,10 @@
 # GenSPGL
 # spglOptions
 
-export spglOptions, spgl_options
+export spglOptions, spgl_setparms
 
 """
-GenSPGL input options composite type. spgl_options is provided as an outer constructor.
+GenSPGL input options composite type. spgl_setparms is provided as an outer constructor.
 
 """
 type spglOptions
@@ -48,7 +48,7 @@ function dummyfun()
     println("This doesn't do anything")
 end
 
-# spgl_options doc
+
 """
 #########################################################################################\n
 spglOptions Outer Constructor\n
@@ -94,7 +94,7 @@ Arguments:\n
     restore      |Bool|      ..... Whether to restore best previous answer. for large
                                     problems, dont want to do this.\n
 """
-function spgl_options(;fid = 1,
+function spgl_setparms(;fid = 1,
                         verbosity = 3,
                         iterations = 100000,
                         nPrevVals = 10,
