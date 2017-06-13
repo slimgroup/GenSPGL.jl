@@ -13,12 +13,12 @@ x0 = zeros(n,1)
 x0[p] = randn(k,1);
 
 b = A*x0
-tau=pi
+tau=convert(Float64,pi)
 
 # LASSO
 sigma = []
 x0=[]
-opts = spgl_setparms()
+opts = spgOptions()
 
-spgl1(A,b,tau = tau)
+spg_lasso(A,b; tau = tau)
 end

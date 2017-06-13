@@ -1,13 +1,13 @@
 # GenSPGL
-# spglOptions
+# spgOptions
 
-export spglOptions, spgl_setparms
-
-"""
-GenSPGL input options composite type. spgl_setparms is provided as an outer constructor.
+export spgOptions
 
 """
-type spglOptions
+GenSPGL input options composite type. 
+
+"""
+type spgOptions
     fid::Integer
     verbosity::Integer
     iterations::Integer
@@ -51,12 +51,11 @@ end
 
 """
 #########################################################################################\n
-spglOptions Outer Constructor\n
-Arguments not specified will be set to their default values. See the spglOptions type docs
-for info regarding argument types.\n
+spgOptions Outer Constructor\n
+Arguments not specified will be set to their default values shown below.\n
 #########################################################################################\n
 
-    spgl_setparms(;fid = 1,
+    spgOptions(;fid = 1,
                     verbosity = 3,
                     iterations = 100000,
                     nPrevVals = 10,
@@ -80,7 +79,7 @@ for info regarding argument types.\n
                     project = dummyfun,
                     primal_norm = dummyfun,
                     dual_norm = dummyfun,
-                    funPenalty = dummyfun,
+                    funPenalty = funLS,
                     proxy = false,
                     linear = false,
                     restore = false)
@@ -88,10 +87,10 @@ for info regarding argument types.\n
 # Examples 
 ```julia
 # Default Options
-julia> opts = spgl_setparms()
+julia> opts = spgOptions()
 
 # Make optional changes
-julia> opts = spgl_setparms(verbosity = 1, iterations = 20000)
+julia> opts = spgOptions(verbosity = 1, iterations = 20000)
 ```
 
 
@@ -133,7 +132,7 @@ Arguments:\n
     restore      |Bool|      ..... Whether to restore best previous answer. for large
                                     problems, dont want to do this.\n
 """
-function spgl_setparms(;fid::Integer = 1,
+function spgOptions(;fid::Integer = 1,
                         verbosity::Integer = 3,
                         iterations::Integer = 100000,
                         nPrevVals::Integer = 10,
@@ -157,12 +156,12 @@ function spgl_setparms(;fid::Integer = 1,
                         project::Function = dummyfun,
                         primal_norm::Function = dummyfun,
                         dual_norm::Function = dummyfun,
-                        funPenalty::Function = dummyfun,
+                        funPenalty::Function = GenSPGL.funLS,
                         proxy::Bool = false,
                         linear::Bool = false,
                         restore::Bool = false)
 
-    opts = spglOptions(fid,
+    opts = spgOptions(fid,
                         verbosity,
                         iterations,
                         nPrevVals,
