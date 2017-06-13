@@ -21,7 +21,7 @@ type spgOptions
     rootMethod::Integer
     activeSetIt::Number
     subspaceMin::Bool
-    iscomplex::Bool
+    iscomplex::Nullable{Bool}
     maxMatvec::Number
     weights::Number
     quitPareto::Bool
@@ -68,7 +68,7 @@ Arguments not specified will be set to their default values shown below.\n
                     rootMethod = 2,
                     activeSetIt = Inf,
                     subspaceMin = false,
-                    iscomplex = false,
+                    iscomplex = Null,
                     maxMatvec = Inf,
                     weights = 1,
                     quitPareto = false,
@@ -109,7 +109,7 @@ Arguments:\n
     rootMethod   |Integer|   ..... Root finding method: 2=quad,1=linear (not used).\n
     activeSetIt, |Number|    ..... Exit with EXIT_ACTIVE_SET if nnz same for # its.\n
     subspaceMin, |Bool|      ..... Use subspace minimization\n
-    iscomplex    |Bool|      ..... Flag set to indicate complex problem\n
+    iscomplex    |Nullable{Bool}|      ..... Flag set to indicate complex problem\n
     maxMatvec    |Number|    ..... Maximum matrix-vector multiplies allowed\n
     weights      |Number|    ..... Weights W in ||Wx||_1\n
     quitPareto   |Bool|      ..... Exits when pareto curve is reached\n
@@ -131,7 +131,7 @@ Arguments:\n
                                     functions to be linear\n
     restore      |Bool|      ..... Whether to restore best previous answer. for large
                                     problems, dont want to do this.\n
-"""
+""" 
 function spgOptions(;fid::Integer = 1,
                         verbosity::Integer = 3,
                         iterations::Integer = 100000,
@@ -145,7 +145,7 @@ function spgOptions(;fid::Integer = 1,
                         rootMethod::Integer = 2,
                         activeSetIt::Number = Inf,
                         subspaceMin::Bool = false,
-                        iscomplex::Bool = false,
+                        iscomplex::Nullable{Bool} = Nullable{Bool}(),
                         maxMatvec::Number = Inf,
                         weights::Number = 1,
                         quitPareto = false,
@@ -161,6 +161,7 @@ function spgOptions(;fid::Integer = 1,
                         linear::Bool = false,
                         restore::Bool = false)
 
+    
     opts = spgOptions(fid,
                         verbosity,
                         iterations,
@@ -195,3 +196,5 @@ function spgOptions(;fid::Integer = 1,
     return opts
 end
 
+#DEVNOTE# Think of adding a method to the constructor so that non-nullable bools
+        # could be passed as an optional input

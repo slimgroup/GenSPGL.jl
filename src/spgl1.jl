@@ -4,6 +4,10 @@ export spgl1
 
 """
 This will contain info on use of spgl1
+
+EXPLICIT METHOD
+
+When implementing JOLI support, provide new method. e.g A::joOp....
 """
 function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
                     x::AbstractArray{xT}=Float64[],
@@ -43,10 +47,10 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     ##--------------------------------------------------------------------------------
     # Initialize Local Variables
     ##--------------------------------------------------------------------------------  
-    iter = 0; itnTotLSQR = 0 #Total SPGL1 and LSQR iterations.
+    iter = 0; itnTotLSQR = 0#Total SPGL1 and LSQR iterations.
     nProdA = 0; nProdAt = 0
     lastFv = [-Inf for i=1:options.nPrevVals] # Last m functions values
-    nLineTot = 0 # Total number of linesearch steps
+    nLineTot = 0            # Total number of linesearch steps
     pintTau = false
     nNewton = 0;
     
@@ -57,10 +61,10 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     stat = false
     timeProject = 0
     timeMatProd = 0
-    nnzIter = 0 # No. of Its with fixed pattern
-    nnzIdx = [] # Active set indicator
-    subspace = false # Flag if did subspace min in current itn
-    stepG = 1 # Step length for projected gradient
+    nnzIter = 0             # No. of Its with fixed pattern
+    nnzIdx = []             # Active set indicator
+    subspace = false        # Flag if did subspace min in current itn
+    stepG = 1               # Step length for projected gradient
     testUpdateTau = 0
 
     ##-------------------------------------------------------------------------------
@@ -68,11 +72,43 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     ##-------------------------------------------------------------------------------
 
     # Determine Initial x, vector length n, and check if complex
+    # Explicit Method
+    #DEVNOTE# Change name to JOLI  once things are working
+    funForward = SpotFunForward
+    options.linear = true
 
-    
+    if isempty(x)
+        if eltype(A)<:Number
+            n = size(A,2)
+            realx = isreal(A) & isreal(b)
+        else
+            x = funForward(x, -b) #DEVNOTE# Check to make sure this is tmp
+            n = length(x)
+            realx = isreal(x) & isreal(b)
+        end
+        x = zeros(n,1)
+    else
+        n = length(x)
+        realx = isreal(x) & isreal(A)
+    end
 
-   
+    (eltype(A)<:Number) && (realx = realx & isreal(A))
 
+    # Override if complex flag was used
+    isnull(options.iscomplex) || (realx = ~get(options.iscomplex))
 
 end #func
 
+
+"""
+Activated when an explicit or JOLI operator is passed in.
+"""
+function SpotFunForward(x::AbstractArray, g::AbstractArray, params::Dict)
+    #DEVNOTE# Double check type of g once in use
+
+    isempty(g) && (f = A*x)
+    isempty(g) || (f = A'*g)
+
+    return f
+
+end
