@@ -13,10 +13,10 @@ include("spg_lasso.jl")
 
 # Penalties
 #DEVNOTE# Obviously generalize these paths
-include("/home/slim/klensink/.julia/v0.5/GenSPGL/src/Penalty/funLS.jl")
+include("Penalty/funLS.jl")
 
 # Examples
 using Gallium
-include("/home/slim/klensink/.julia/v0.5/GenSPGL/examples/spgdemo.jl")
+include("Examples/spgdemo.jl")
 
 end # module
