@@ -44,6 +44,8 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # Threshold for signifigant Newton step
     pivTol = 1e-12
 
+
+
     ##--------------------------------------------------------------------------------
     # Initialize Local Variables
     ##--------------------------------------------------------------------------------  
@@ -71,6 +73,8 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # End Init
     ##-------------------------------------------------------------------------------
 
+
+
     # Determine Initial x, vector length n, and check if complex
     # Explicit Method
     #DEVNOTE# Change name to JOLI  once things are working
@@ -97,6 +101,39 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # Override if complex flag was used
     isnull(options.iscomplex) || (realx = ~get(options.iscomplex))
 
+
+    
+    # Check if all weights (if any) are strictly positive. In previous
+    # versions we also checked if the number of weights was equal to
+    # n. In the case of multiple measurement vectors, this no longer
+    # needs to apply, so the check was removed.
+    isinf(options.weights) && error("Weights must be finite")
+    options.weights > 0 || error("Weights must be strictly positive")
+    
+    # Quick exit if sigma >= ||b||. Set Tau = 0 to short circuit the loop
+    if bNorm <= sigma
+        println("W: sigma >= ||b||.  Exact solution is x = 0.")
+        tau = 0
+        singleTau = true
+    end
+
+    # Don't do subspaceMin if x is complex
+    if (~realx & options.subspaceMin)
+        println("W: Subspace minimization disabled when variables are complex")
+        subspaceMin = false
+    end
+
+
+    #DEVNOTE# Once these are being updated check to see if type should be inferred
+            # from promotion rules
+    # Pre-Allocate iteration info vectors
+    xNorm1 = zeros(Float64, min(options.iterations,10000))
+    rNorm2 = zeros(Float64, min(options.iterations,10000))
+    lambda = zeros(Float64, min(options.iterations,10000))
+
+    # Exit Condition Dict
+
+    
 end #func
 
 
