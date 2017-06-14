@@ -16,6 +16,7 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
                     options::spgOptions = spgOptions(),
                     params::Dict{String,Number} = Dict{String,Number}())
 
+    #DEVNOTE# Add timing
     #DEVNOTE# Could make Tau and Sigma nullable types? However, as long as
     # Tau and Sigma are always Float64 this wont be a problem
     println("Script made it to spgl1")
@@ -131,8 +132,11 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     rNorm2 = zeros(Float64, min(options.iterations,10000))
     lambda = zeros(Float64, min(options.iterations,10000))
 
-    # Exit Condition Dict
+    # Create ExitCondition with null trigger
+    exit_status = spgExitCondition()
 
+
+    
     
 end #func
 

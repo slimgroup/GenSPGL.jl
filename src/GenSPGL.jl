@@ -5,6 +5,7 @@ module GenSPGL
 
 # Types
 include("spgOptions.jl")
+include("spgExitCondition.jl")
 
 # Methods
 include("spgl1.jl")
