@@ -1,4 +1,5 @@
 #SPG Exit Condition Dict Constructor
+import Base.print
 
 export spgExitCondition, print
 
@@ -49,9 +50,12 @@ end
 
 #DEVNOTE# Not sure if this should be added to base, right now it requires GenSPGL.print()
 """
-GenSPGL.print(ec::spgExitCondition)\n
+--------------------------------------------------------------------------------
+GenSPGL\n
+Use: print(ec::spgExitCondition)\n
 
 Prints the triggered exit condition reached in spgl1.\n
+--------------------------------------------------------------------------------
 """
 function print(ec::spgExitCondition)
 
@@ -63,9 +67,12 @@ function print(ec::spgExitCondition)
         info = ec.info[val]
 
         # Output
-        println("Exit Condition Number:      ", string(val))
-        println("Exit Condition Triggered:   "reason)
-        println("Addition Information:       "info)
+        println("""
+        Exit Condition Number:          $(val)\n
+        Exit Condition Triggered:       $(reason)\n
+        Additional Information:         $(info)
+        
+        """)
     end
 
 end

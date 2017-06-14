@@ -56,7 +56,7 @@ Arguments not specified will be set to their default values shown below.\n
 #########################################################################################\n
 
     spgOptions(;fid = 1,
-                    verbosity = 3,
+                    verbosity = 1,
                     iterations = 100000,
                     nPrevVals = 10,
                     bpTol = 1e-6,
@@ -90,14 +90,14 @@ Arguments not specified will be set to their default values shown below.\n
 julia> opts = spgOptions()
 
 # Make optional changes
-julia> opts = spgOptions(verbosity = 1, iterations = 20000)
+julia> opts = spgOptions(verbosity = 0, iterations = 20000)
 ```
 
 
 Arguments:\n
     |___Field____||__Type__||_____________________Description____________________________|\n
     fid          |Integer|   ..... File ID for output\n
-    verbosity    |Integer|   ..... Verbosity level\n
+    verbosity    |Integer|   ..... Verbosity level, 0 = Silent, 1 = Loud\n
     iterations   |Integer|   ..... Max number of iterations\n
     nPrevVals    |Integer|   ..... Number previous func values for linesearch\n
     bpTol        |Number|    ..... Tolerance for basis pursuit solution \n
@@ -133,7 +133,7 @@ Arguments:\n
                                     problems, dont want to do this.\n
 """ 
 function spgOptions(;fid::Integer = 1,
-                        verbosity::Integer = 3,
+                        verbosity::Integer = 1,
                         iterations::Integer = 100000,
                         nPrevVals::Integer = 10,
                         bpTol::Number = 1e-6,

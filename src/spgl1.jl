@@ -15,11 +15,16 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
                     sigma::AbstractFloat=NaN,
                     options::spgOptions = spgOptions(),
                     params::Dict{String,Number} = Dict{String,Number}())
+    
+    REVISION = "0.1"
+    DATE = "June, 2017"
 
-    #DEVNOTE# Add timing
     #DEVNOTE# Could make Tau and Sigma nullable types? However, as long as
     # Tau and Sigma are always Float64 this wont be a problem
     println("Script made it to spgl1")
+
+    #DEVNOTE# Add timing
+    m = length(b)
 
     #Add options proxy to params dict
     params["proxy"] = options.proxy
@@ -135,7 +140,40 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # Create ExitCondition with null trigger
     exit_status = spgExitCondition()
 
+    #Prepare Log Header
+    logheader_1 = """
+    ================================================================================  
+    GenSPGL.jl, Rev $(REVISION), $(DATE)
+    ================================================================================\n
 
+    No. Rows                :$(m)               
+    No. Columns             :$(n)
+    Initial Tau             :$(tau)             
+    Penalty                 :$(options.funPenalty)
+    Regularizer             :$(options.primal_norm)
+    Penalty(b)              :$(bNorm)
+    Optimality tol          :$(options.optTol)
+    Basis Pursuit tol       :$(options.bpTol)
+    Maximum Iterations      :$(options.iterations)
+    """
+    
+    singleTau && (logheader_2 = """
+    Target reg. Norm of x   :$(tau)\n
+
+    Iter    Objective   Relative_Error  gNorm   stepG   nnzX    nnzG
+    --------------------------------------------------------------------------------\n
+    """)
+
+    singleTau || (logheader_2 = """
+    Target Objective        :$(sigma)\n
+
+    Iter    Objective   Relative_Error  Rel_Error   gNorm   stepG   nnzX    nnzG    tau
+    -----------------------------------------------------------------------------------\n
+    """)
+    logheader = logheader_1*logheader_2
+    
+    # Decide what to do with log header based on verbosity setting
+    (options.verbosity == 1) && println(logheader)
     
     
 end #func
