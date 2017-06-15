@@ -23,7 +23,7 @@ type spgOptions
     subspaceMin::Bool
     iscomplex::Nullable{Bool}
     maxMatvec::Number
-    weights::Number
+    weights::AbstractArray
     quitPareto::Bool
     minPareto::Integer
     lineSrchIt::Integer
@@ -70,7 +70,7 @@ Arguments not specified will be set to their default values shown below.\n
                     subspaceMin = false,
                     iscomplex = Null,
                     maxMatvec = Inf,
-                    weights = 1,
+                    weights = [1],
                     quitPareto = false,
                     minPareto = 3,
                     lineSrchIt = 1,
@@ -111,7 +111,7 @@ Arguments:\n
     subspaceMin, |Bool|      ..... Use subspace minimization\n
     iscomplex    |Nullable{Bool}|      ..... Flag set to indicate complex problem\n
     maxMatvec    |Number|    ..... Maximum matrix-vector multiplies allowed\n
-    weights      |Number|    ..... Weights W in ||Wx||_1\n
+    weights      |AbsrtactArray|    ..... Weights W in ||Wx||_1\n
     quitPareto   |Bool|      ..... Exits when pareto curve is reached\n
     minPareto    |Integer|   ..... If quitPareto is on, the minimum number of iterations
                                     before checking for quitPareto conditions\n
@@ -147,13 +147,13 @@ function spgOptions(;fid::Integer = 1,
                         subspaceMin::Bool = false,
                         iscomplex::Nullable{Bool} = Nullable{Bool}(),
                         maxMatvec::Number = Inf,
-                        weights::Number = 1,
+                        weights::AbstractArray = [1],
                         quitPareto = false,
                         minPareto::Integer = 3,
                         lineSrchIt::Integer = 1,
                         feasSrchIt::Integer = 10000,
                         ignorePErr = false,
-                        project::Function = dummyfun,
+                        project::Function = GenSPGL.NormL1_project,
                         primal_norm::Function = dummyfun,
                         dual_norm::Function = dummyfun,
                         funPenalty::Function = GenSPGL.funLS,

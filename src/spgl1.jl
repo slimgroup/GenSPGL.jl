@@ -9,7 +9,7 @@ EXPLICIT METHOD
 
 When implementing JOLI support, provide new method. e.g A::joOp....
 """
-function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
+function spgl1{xT<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray{Tb};
                     x::AbstractArray{xT}=Float64[],
                     tau::AbstractFloat=NaN,
                     sigma::AbstractFloat=NaN,
@@ -23,7 +23,7 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # Tau and Sigma are always Float64 this wont be a problem
     println("Script made it to spgl1")
 
-    #DEVNOTE# Add timing
+    tic()
     m = length(b)
 
     #Add options proxy to params dict
@@ -56,7 +56,7 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # Initialize Local Variables
     ##--------------------------------------------------------------------------------  
     iter = 0; itnTotLSQR = 0#Total SPGL1 and LSQR iterations.
-    nProdA = 0; nProdAt = 0
+    nProdA = [0]; nProdAt = [0]
     lastFv = [-Inf for i=1:options.nPrevVals] # Last m functions values
     nLineTot = 0            # Total number of linesearch steps
     pintTau = false
@@ -67,8 +67,8 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     bNorm, b_normalized = options.funPenalty(b, params)
 
     stat = false
-    timeProject = 0
-    timeMatProd = 0
+    timeProject = Float64[0]
+    timeMatProd = Float64[0]
     nnzIter = 0             # No. of Its with fixed pattern
     nnzIdx = []             # Active set indicator
     subspace = false        # Flag if did subspace min in current itn
@@ -79,7 +79,7 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # End Init
     ##-------------------------------------------------------------------------------
 
-
+    #DEVNOTE# This could be a splitting point for multiple dispatch
 
     # Determine Initial x, vector length n, and check if complex
     # Explicit Method
@@ -113,8 +113,8 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # versions we also checked if the number of weights was equal to
     # n. In the case of multiple measurement vectors, this no longer
     # needs to apply, so the check was removed.
-    isinf(options.weights) && error("Weights must be finite")
-    options.weights > 0 || error("Weights must be strictly positive")
+    any(isinf(options.weights)) && error("Weights must be finite")
+    any(options.weights .> 0) || error("Weights must be strictly positive")
     
     # Quick exit if sigma >= ||b||. Set Tau = 0 to short circuit the loop
     if bNorm <= sigma
@@ -175,8 +175,79 @@ function spgl1{xT<:AbstractFloat}(A::AbstractArray, b::AbstractArray;
     # Decide what to do with log header based on verbosity setting
     (options.verbosity == 1) && println(logheader)
     
+
+
+    # Project the stating point and evaluate function and gradient
+    r = typeof(b)() 
+   
     
+    if isempty(x) #matlab Legacy, this can never be invoked. see 90-99
+        
+        #DEVNOTE# Why copy? Waste of mem and time. Check if b is used again
+        r = deepcopy(b) 
+        f,g,g2 = funCompositeR(r, funForward, timeMatProd, nProdAt)
+    else
+        x = project(x,tau, timeProject, options)
+
+    end
+       
+    return r
 end #func
+
+
+
+"""
+Use:    x = project(x::AbstractArray, tau::Number, timeProject::AbstratcArray,
+                    options::spgOptions)
+"""
+function project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
+                    options::spgOptions)
+    
+    (options.verbosity == 1) && println("Being Project")
+    tStart = toc()
+
+    #DEVNOTE# Might not need this if-else since using params dict
+    string(options.project)=="GenSPGL.TraceNorm_project" && (x = options.project(x, tau,
+                                                    weights = options.weights,params)) 
+
+    string(options.project)=="GenSPGL.TraceNorm_project" || (x = options.project(x, tau,
+                                                    weights = options.weights)) 
+
+ 
+    #DEVNOTE# Replace with @elapsed at call #timeProject[1] += (toc() - tStart)
+
+    (options.verbosity == 1) && println("Finish Project")
+
+
+end
+
+
+
+"""
+GenSPGL
+
+Use:    f,g1,g2 = funCompositeR(r, funForward, funPenalty, params, timeMatProd, nProdAt)
+"""
+function funCompositeR{T1<:Float64,T2<:Float64}(r::AbstractArray,
+                        funForward::Function, funPenalty::Function, 
+                        timMatProd::AbstractArray{T1}, nProdAt::AbstractArray{T2};
+                        params::Dict{String,Number} = Dict{String,Number}())
+
+    tStart = toc()
+    nProdAt[1] += one(T2)
+    f,v = funPenalty(r, params)
+    
+    if ~(params["proxy"])
+        g1 = funForward(x, -v, params)
+        g2 = 0
+    else
+        g1,g2 = funForward(x, -v, params)
+    end
+    timMatProd[1] += (toc() - tStart)
+
+    return f,g1,g2
+end
+
 
 
 """

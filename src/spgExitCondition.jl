@@ -4,7 +4,6 @@ import Base.print
 export spgExitCondition, print
 
 type spgExitCondition
-    
     triggered::Nullable{Integer}
     conditions::Dict{Integer,String}
     info::Array{String,1}
@@ -44,7 +43,8 @@ function spgExitCondition(;trigger::Nullable{Integer} = Nullable{Integer}())
 
     # Construct
     exitcon = spgExitCondition(trigger, conds, info)
-
+    
+    return exitcon
 end
 
 
