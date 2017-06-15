@@ -217,7 +217,8 @@ function project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
     #DEVNOTE# Replace with @elapsed at call #timeProject[1] += (toc() - tStart)
 
     (options.verbosity == 1) && println("Finish Project")
-
+    
+    return x
 
 end
 

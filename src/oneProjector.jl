@@ -43,6 +43,9 @@ function oneProjector(b::AbstractArray, d::AbstractArray, tau::AbstractFloat)
 
     ~(length(d)==1) && ~(length(b) == length(d)) && println("""
     Vectors 'b' and 'd' must be the same length
+    Length b: $(length(b))
+    Length d: $(length(d))
+    
     """)
     
     # Quick return for the easy case
@@ -58,6 +61,19 @@ function oneProjector(b::AbstractArray, d::AbstractArray, tau::AbstractFloat)
     # Perform projection
     if length(d)==1
         x,itn = oneProjectorMex(b_abs, d[1], tau)
+        
+        #DEVNOTE# remove 
+        println("""
+        oneProjectorMex results:
+        ================================================================================
+        x = \n
+        $x
+
+        itn = \n
+        $itn
+
+
+        """)
         return x,itn
     else
         d_abs = abs(d)
@@ -97,28 +113,80 @@ function oneProjectorMex{T<:Number}(b::AbstractArray{T}, d::Number, tau::Abstrac
     alphaPrev = 0
 
     for j = 1:n
-        csb += b[j]
+        csb += b_sort[j]
         alpha = csb/j
 
         # Finish as soon as constraint can be satisfied w/o exceeding current min val of b
-        (alpha >= b[j]) && break
+        (alpha >= b_sort[j]) && break
 
         alphaprev = alpha
 
     end
 
     # Set the solution by apply soft-thresholding with previous value of alpha
-    x[idx] = max(0, b .- alphaPrev)
+    x[idx] = max(0, b_sort .- alphaPrev)
 
     # Set number of iterations
     itn = j
 
     return x, itn
 
-
 end
 
 
+
+"""
+Use: x,itn = oneProjectorMex(b::Abstractvector, d::AbstractVector, tau::Number)
+"""
+function oneProjectorMex{Tb<:Number,Td<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Td}, tau::Number)
+    
+    println("Made it into oneProjectorMex for vector d")
+
+    #Get type of b.*d
+    if Td == Tb
+        Tdb = Td
+    else
+        Tdb = promote_rule(Td,Tb)
+    end
+
+    n = length(b)
+    x = zeros(Tdb,n,1)
+
+    #Check for quick exit
+    (tau >= norm(d.*b,1)) && (x=b; itn= 0; return x,itn)
+    (tau < eps()) && (itn = 0; return x,itn)
+
+    # Preprocessing
+    idx = sortperm(b./d, rev = true)
+    b_sort = b[idx]
+    d_sort = d[idx]
+
+    # Optimize
+    csdb = zero(Tdb)
+    csd2 = zero(Tdb)
+    soft = zero(Tdb)
+    alpha1 = zero(Tdb)
+    soft = zero(Tdb)
+    i = 1
+
+    while i <= n
+        csdb += d[i].*b[i]
+        csd2 = csd2 + d[i].*d[i]
+
+        alpha1 = (csdb - tau)/ csd2
+        alpha2 = bd[i]
+
+        (alpha1 >= alpha2) && break
+
+        soft = alpha1
+        i += 1
+    end
+
+    x[idx[1:i-1]] = b[1:i-1] - d[1:i-1]*max(0,soft)
+    itn = i
+
+    return x,itn
+end
 
 """
 #DEVNOTE# Don't need this right now, maybe not ever

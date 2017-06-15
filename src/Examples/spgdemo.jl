@@ -18,7 +18,7 @@ tau=convert(Float64,pi)
 # LASSO
 sigma = []
 x0=[]
-opts = spgOptions()
+opts = spgOptions(weights = 10*ones(n))
 
 spg_lasso(A,b; tau = tau, options = opts)
 end
