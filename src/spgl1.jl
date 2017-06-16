@@ -187,7 +187,7 @@ function spgl1{xT<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
         r = deepcopy(b) 
         f,g,g2 = funCompositeR(r, funForward, timeMatProd, nProdAt)
     else
-        x = project(x,tau, timeProject, options)
+        x,itn = project(x,tau, timeProject, options)
 
     end
        
@@ -207,18 +207,17 @@ function project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
     tStart = toc()
 
     #DEVNOTE# Might not need this if-else since using params dict
-    string(options.project)=="GenSPGL.TraceNorm_project" && (x = options.project(x, tau,
-                                                    weights = options.weights,params)) 
-
-    string(options.project)=="GenSPGL.TraceNorm_project" || (x = options.project(x, tau,
-                                                    weights = options.weights)) 
-
+    if (string(options.project)=="GenSPGL.TraceNorm_project")
+        x,itn = options.project(x, tau, options.weights.params) 
+    else
+        x,itn = options.project(x, tau, options.weights)
+    end
  
     #DEVNOTE# Replace with @elapsed at call #timeProject[1] += (toc() - tStart)
 
     (options.verbosity == 1) && println("Finish Project")
     
-    return x
+    return x,itn
 
 end
 

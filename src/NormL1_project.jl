@@ -2,11 +2,13 @@
 
 export NormL1_project
 
+
+#DEVNOTE# Backtrace weights so only oneProjectorMex is type tight
 """
-Use: x = NormL1_project(x,weights,tau)
+Use: x,itn = NormL1_project(x,weights,tau)
 
 """
-function NormL1_project(x::AbstractArray, tau::Number; weights::AbstractArray = [1])
+function NormL1_project(x::AbstractArray, tau::Number, weights)
 
     println("Script made it into NORML1_project")
 

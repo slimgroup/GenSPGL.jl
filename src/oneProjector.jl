@@ -37,7 +37,7 @@ ONEPROJECTOR  Projects b onto the weighted one-norm ball of radius tau
 ================================================================================
 """
 #DEVNOTE# Eventually use multiple dispatch to support scalar weights
-function oneProjector(b::AbstractArray, d::AbstractArray, tau::AbstractFloat)
+function oneProjector(b::AbstractArray, d, tau::AbstractFloat)
 
     println("Script made it into oneProjector") 
 
@@ -48,6 +48,7 @@ function oneProjector(b::AbstractArray, d::AbstractArray, tau::AbstractFloat)
     
     """)
     
+    #DEVNOTE# Not necessary if there is a scalar method 
     # Quick return for the easy case
     if (length(d)==1) & (d[1] == 0) 
         x = b
