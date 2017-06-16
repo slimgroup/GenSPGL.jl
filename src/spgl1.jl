@@ -92,7 +92,7 @@ function spgl1{xT<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
             n = size(A,2)
             realx = isreal(A) & isreal(b)
         else
-            x = funForward(x, -b) #DEVNOTE# Check to make sure this is tmp
+            x = funForward(A, x, -b) #DEVNOTE# Check to make sure this is tmp
             n = length(x)
             realx = isreal(x) & isreal(b)
         end
@@ -181,30 +181,33 @@ function spgl1{xT<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
     r = typeof(b)() 
    
     
-    if isempty(x) #matlab Legacy, this can never be invoked. see 90-99
+    if isempty(x)#DEVNOTE# matlab Legacy, this can never be invoked. see 90-99
         
         #DEVNOTE# Why copy? Waste of mem and time. Check if b is used again
         r = deepcopy(b) 
-        f,g,g2 = funCompositeR(r, funForward, timeMatProd, nProdAt)
+        f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
     else
         x,itn = project(x,tau, timeProject, options)
-
+        r = b - funForward(A, x, [], params)
+        nProdA += 1
+        f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
+        dx = project(x-g, tau, timeProject, options) - x
     end
        
+
     return r
 end #func
 
 
 
 """
-Use:    x = project(x::AbstractArray, tau::Number, timeProject::AbstratcArray,
+Use:    x = project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
                     options::spgOptions)
 """
 function project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
                     options::spgOptions)
     
     (options.verbosity == 1) && println("Being Project")
-    tStart = toc()
 
     #DEVNOTE# Might not need this if-else since using params dict
     if (string(options.project)=="GenSPGL.TraceNorm_project")
@@ -226,24 +229,22 @@ end
 """
 GenSPGL
 
-Use:    f,g1,g2 = funCompositeR(r, funForward, funPenalty, params, timeMatProd, nProdAt)
+Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params, nProdAt, params)
 """
-function funCompositeR{T1<:Float64,T2<:Float64}(r::AbstractArray,
+function funCompositeR(A::AbstractArray,x::AbstractArray,r::AbstractArray,
                         funForward::Function, funPenalty::Function, 
-                        timMatProd::AbstractArray{T1}, nProdAt::AbstractArray{T2};
-                        params::Dict{String,Number} = Dict{String,Number}())
+                        nProdAt::AbstractArray,
+                        params::Dict{String,Number})
 
-    tStart = toc()
-    nProdAt[1] += one(T2)
+    nProdAt[1] += one(eltype(nProdAt))
     f,v = funPenalty(r, params)
     
     if ~(params["proxy"])
-        g1 = funForward(x, -v, params)
+        g1 = funForward(A, x, -v, params)
         g2 = 0
     else
-        g1,g2 = funForward(x, -v, params)
+        g1,g2 = funForward(A, x, -v, params)
     end
-    timMatProd[1] += (toc() - tStart)
 
     return f,g1,g2
 end
@@ -253,7 +254,7 @@ end
 """
 Activated when an explicit or JOLI operator is passed in.
 """
-function SpotFunForward(x::AbstractArray, g::AbstractArray, params::Dict)
+function SpotFunForward(A::AbstractArray, x::AbstractArray, g::AbstractArray, params::Dict)
     #DEVNOTE# Double check type of g once in use
 
     isempty(g) && (f = A*x)
