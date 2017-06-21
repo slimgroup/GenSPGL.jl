@@ -196,8 +196,26 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
         itn += itn_tmp
     end
        
+    dxNorm = norm(dx,Inf)
+    if dxNorm < (1/options.stepMax)
+        gStep = stepMax
+    else
+        gStep = min(options.stepMax, max(options.stepMin, 1/dxNorm))
+    end
 
-    return x,r,f,g,g2,dx,itn
+    # Required for non-monotone strategy
+    lastFv[1] = f
+    fBest = f
+    xBest = x
+    fOld = f
+
+    println("Init Finished")
+
+    # Wrap main loop in a function to ease type stability
+    #@code_warntype spglcore()
+
+
+    return x,r,f,g,g2,dx,itn, gStep
 end #func
 
 
@@ -243,7 +261,7 @@ function funCompositeR(A::AbstractArray,x::AbstractArray,r::AbstractArray,
     
     if ~(params["proxy"])
         g1 = funForward(A, x, -v, params)
-        g2 = 0
+        g2 = zero(eltype(g1))
     else
         g1,g2 = funForward(A, x, -v, params)
     end
