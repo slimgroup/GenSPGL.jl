@@ -9,8 +9,8 @@ EXPLICIT METHOD
 
 When implementing JOLI support, provide new method. e.g A::joOp....
 """
-function spgl1{xT<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray{Tb};
-                    x::AbstractArray{xT}=Float64[],
+function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray{Tb};
+                    x::AbstractArray{Tx}=Array{Tb,1}(),
                     tau::AbstractFloat=NaN,
                     sigma::AbstractFloat=NaN,
                     options::spgOptions = spgOptions(),
@@ -96,7 +96,7 @@ function spgl1{xT<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
             n = length(x)
             realx = isreal(x) & isreal(b)
         end
-        x = zeros(n,1)
+        x = zeros(n)
     else
         n = length(x)
         realx = isreal(x) & isreal(A)
@@ -191,11 +191,13 @@ function spgl1{xT<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
         r = b - funForward(A, x, [], params)
         nProdA += 1
         f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
-        dx = project(x-g, tau, timeProject, options) - x
+        dx_tmp, itn_tmp = project(x-g, tau, timeProject, options)
+        dx = dx_tmp - x
+        itn += itn_tmp
     end
        
 
-    return r
+    return x,r,f,g,g2,dx,itn
 end #func
 
 

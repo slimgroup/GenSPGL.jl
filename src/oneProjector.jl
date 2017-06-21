@@ -111,7 +111,6 @@ function oneProjectorMex{T<:Number}(b::AbstractArray{T}, d::Number, tau::Abstrac
     b_sort = b[idx]
 
     csb = -tau
-    alphaPrev = 0
 
     for j = 1:n
         csb += b_sort[j]
@@ -125,7 +124,7 @@ function oneProjectorMex{T<:Number}(b::AbstractArray{T}, d::Number, tau::Abstrac
     end
 
     # Set the solution by apply soft-thresholding with previous value of alpha
-    x[idx] = max(0, b_sort .- alphaPrev)
+    x[idx] = max(0, b_sort .- alphaprev)
 
     # Set number of iterations
     itn = j

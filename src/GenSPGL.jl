@@ -18,7 +18,6 @@ include("oneprojector.jl")
 include("Penalty/funLS.jl")
 
 # Examples
-using Gallium
 include("Examples/spgdemo.jl")
 
 end # module

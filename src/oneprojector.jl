@@ -105,12 +105,13 @@ function oneprojectormex{T<:Number}(b::AbstractArray{T}, d::Number, tau::Abstrac
     (tau < eps()) && (itn = 0; return itn)
 
     # Preprocessing (b is assumed to be >= 0)
-    idx = sortperm(b, rev=true)
+    idx = sortperm_col(b, rev=true)
     b_sort = b[idx]
 
     csb = -tau
-    alphaPrev = 0
+    alphaprev = zero(T)
 
+    j_out = 1
     for j = 1:n
         csb += b_sort[j]
         alpha = csb/j
@@ -120,13 +121,14 @@ function oneprojectormex{T<:Number}(b::AbstractArray{T}, d::Number, tau::Abstrac
 
         alphaprev = alpha
 
+        j_out = j
     end
 
     # Set the solution by apply soft-thresholding with previous value of alpha
-    x[idx] = max(0, b_sort .- alphaPrev)
+    x[idx] = max(0, b_sort .- alphaprev)
 
     # Set number of iterations
-    itn = j
+    itn = j_out
 
     return x, itn
 
@@ -142,21 +144,18 @@ function oneprojectormex{Tb<:Number,Td<:Number}(b::AbstractVector{Tb}, d::Abstra
     println("Made it into oneprojectormex for vector d")
 
     #Get type of b.*d
-    if Td == Tb
-        Tdb = Td
-    else
-        Tdb = promote_rule(Td,Tb)
-    end
+    Tdb = promote_rule(Td,Tb)
 
-    n = length(b)
-    x = zeros(Tdb,n,1)
 
     #Check for quick exit
     (tau >= norm(d.*b,1)) && (x=b; itn= 0; return x,itn)
     (tau < eps()) && (itn = 0; return x,itn)
 
+    n = length(b)
+    x = zeros(Tdb,n,1)
+    
     # Preprocessing
-    idx = sortperm(b./d, rev = true)
+    idx = sortperm_col(b./d, rev = true)
     b_sort = b[idx]
     d_sort = d[idx]
 
