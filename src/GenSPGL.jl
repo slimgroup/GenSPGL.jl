@@ -11,7 +11,7 @@ include("spgExitCondition.jl")
 include("spgl1.jl")
 include("spg_lasso.jl")
 include("NormL1_project.jl")
-include("oneProjector.jl")
+include("oneprojector.jl")
 
 # Penalties
 #DEVNOTE# Obviously generalize these paths
