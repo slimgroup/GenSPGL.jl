@@ -22,5 +22,4 @@ opts = spgOptions()
 
 spg_lasso(A,vec(b); tau = tau, options = opts)
 
-return b
 end

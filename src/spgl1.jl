@@ -9,8 +9,8 @@ EXPLICIT METHOD
 
 When implementing JOLI support, provide new method. e.g A::joOp....
 """
-function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray{Tb};
-                    x::AbstractArray{Tx}=Array{Tb,1}(),
+function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVector{Tb};
+                    x::AbstractVector{Tx}=Array{Tb,1}(),
                     tau::AbstractFloat=NaN,
                     sigma::AbstractFloat=NaN,
                     options::spgOptions = spgOptions(),
@@ -61,11 +61,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
     nLineTot = 0            # Total number of linesearch steps
     pintTau = false
     nNewton = 0;
-    
-    #DEVNOTE# Consider making a composite params type for each funPenalty instead of
-            # the current Dict solution
     bNorm, b_normalized = options.funPenalty(b, params)
-
     stat = false
     timeProject = Float64[0]
     timeMatProd = Float64[0]
@@ -211,10 +207,22 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
 
     println("Init Finished")
 
+    # Wrap up initialized variables
+    init = spgInit(x,
+                    tau,
+                    sigma,
+                    g,
+                    g2,
+                    f,
+                    nnzIdx,
+                    options,
+                    params,
+                    timeProject)
+                    
     # Wrap main loop in a function to ease type stability
-    @code_warntype spglcore(x, tau, sigma, vec(g), g2, f, timeProject,  options, params)
+    @code_warntype spglcore(init)
 
-    return x,r,f,g,g2,dx,itn, gStep
+    return init
 end #func
 
 
