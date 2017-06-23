@@ -20,5 +20,7 @@ sigma = []
 x0=[]
 opts = spgOptions()
 
-spg_lasso(A,b; tau = tau, options = opts)
+spg_lasso(A,vec(b); tau = tau, options = opts)
+
+return b
 end

@@ -37,18 +37,26 @@ ONEPROJECTOR  Projects b onto the weighted one-norm ball of radius tau
 #DEVNOTE# Eventually use multiple dispatch to support scalar weights
 function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
 
+    # This function is type stable except for 2 temp variables.
+    # They shouldnt be a performance issue 
     println("Script made it into oneprojector") 
+    
+    len_d = length(d)
+    len_b = length(b)
 
-    ~(length(d)==1) && ~(length(b) == length(d)) && println("""
+    ~(len_d==1) && ~(len_b == len_d) && println("""
     Vectors 'b' and 'd' must be the same length
-    Length b: $(length(b))
-    Length d: $(length(d))
+    Length b: $(len_b)
+    Length d: $(len_d)
     
     """)
-    
+   
+    # Declare x for stability
+    x::typeof(b) = similar(b)
+    itn::Int = zero(Int)
     #DEVNOTE# Not necessary if there is a scalar method 
     # Quick return for the easy case
-    if (length(d)==1) & (d[1] == 0) 
+    if (len_d==1) & (d[1] == 0) 
         x = b
         itn = 0
         return x, itn
@@ -58,23 +66,13 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
     b_abs = abs(b)
 
     # Perform projection
-    if length(d)==1
-        x,itn = oneprojectormex(b_abs, d[1], tau)
+    if len_d==1
         
-        #DEVNOTE# remove 
-        println("""
-        oneprojectormex results:
-        ================================================================================
-        x = \n
-        $x
-
-        itn = \n
-        $itn
-
-
-        """)
+        println("$(typeof(oneprojectormex(b_abs, d[1], tau)))")
+        x,itn = oneprojectormex(b_abs, d[1], tau)
         return x,itn
     else
+        
         d_abs = abs(d)
         idx = find(d .> eps())
         x = deepcopy(b_abs) #DEVNOTE# Double check avoiding referencing is necessary
@@ -89,15 +87,16 @@ end
 oneprojectormex for scalar weight
 oneprojectormex_I clone
 """
-function oneprojectormex{T<:Number}(b::AbstractArray{T}, d::Number, tau::AbstractFloat)
+function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::AbstractFloat)
 
     println("Script made it into oneprojectormex for scalar weight")
     
     tau = tau/abs(d)
-
+    len_b = length(b)
+    
     #Initialization
-    n = length(b)
-    x = zeros(T,n,1)
+    n = len_b
+    x = zeros(T,n)
     bNorm = norm(b,1)
 
     #Check for quick exit
@@ -146,12 +145,14 @@ function oneprojectormex{Tb<:Number,Td<:Number}(b::AbstractVector{Tb}, d::Abstra
     #Get type of b.*d
     Tdb = promote_rule(Td,Tb)
 
-
+    len_d = length(d)
+    len_b = length(b)
+    
     #Check for quick exit
     (tau >= norm(d.*b,1)) && (x=b; itn= 0; return x,itn)
     (tau < eps()) && (itn = 0; return x,itn)
 
-    n = length(b)
+    n = len_b
     x = zeros(Tdb,n,1)
     
     # Preprocessing
@@ -205,6 +206,13 @@ function sortperm_col(A::AbstractMatrix; rev::Bool = false)
     for i = 1:m
         idx[:,i] = sortperm(A[:,i], rev = rev)
     end
+
+    return idx
+end
+            
+function sortperm_col(A::AbstractVector; rev::Bool = false)
+
+    idx = sortperm(A, rev = rev)
 
     return idx
 end

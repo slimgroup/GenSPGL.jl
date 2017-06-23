@@ -8,31 +8,30 @@ export NormL1_project
 Use: x,itn = NormL1_project(x,weights,tau)
 
 """
-function NormL1_project(x::AbstractArray, tau::Number, weights)
+function NormL1_project{Tx<:Real}(x::AbstractVector{Tx}, tau::Number, weights, params)
 
-    println("Script made it into NORML1_project")
-
-    if isreal(x)
-        x,itn = oneprojector(x, weights, tau)
-    else
-        xa = abs(x)
-        idx = find(xa .< eps())
-        xc,itn = oneprojector(xa, weights, tau)
-        xc = xc ./ xa
-        xc[idx] = 0
-        x = x.*xc 
-    end
+    println("Script made it into NORML1_project for real x")
     
+    x_out,itn = oneprojector(x, weights, tau)
+    
+    return x_out,itn
+end
 
-    println("""
-    ================================================================================
-    NormL!_project results:
-    x = \n
-    $x\n
 
-    itn = \n
-    $itn
 
-    """)
-    return x,itn
+"""
+For Complex
+"""
+function NormL1_project{Tx<:Complex}(x::AbstractVector{Tx}, tau::Number, weights, params)
+
+    println("Script made it into NORML1_project for complex x")
+    
+    xa = abs(x)
+    idx = find(xa .< eps())
+    xc,itn = oneprojector(xa, weights, tau)
+    xc = xc ./ xa
+    xc[idx] = 0
+    x_out = x.*xc 
+    
+    return x_out,itn
 end

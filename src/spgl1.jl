@@ -1,6 +1,6 @@
 # SPGL
 
-export spgl1
+export spgl1, project
 
 """
 This will contain info on use of spgl1
@@ -187,11 +187,11 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
         r = deepcopy(b) 
         f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
     else
-        x,itn = project(x,tau, timeProject, options)
+        x,itn = project(x,tau, timeProject, options, params)
         r = b - funForward(A, x, [], params)
         nProdA += 1
         f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
-        dx_tmp, itn_tmp = project(x-g, tau, timeProject, options)
+        dx_tmp, itn_tmp = project(x-g, tau, timeProject, options, params)
         dx = dx_tmp - x
         itn += itn_tmp
     end
@@ -212,8 +212,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractArray
     println("Init Finished")
 
     # Wrap main loop in a function to ease type stability
-    #@code_warntype spglcore()
-
+    @code_warntype spglcore(x, tau, sigma, vec(g), g2, f, timeProject,  options, params)
 
     return x,r,f,g,g2,dx,itn, gStep
 end #func
@@ -222,25 +221,20 @@ end #func
 
 """
 Use:    x = project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
-                    options::spgOptions)
+                    options::spgOptions, params::Dict)
 """
-function project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
-                    options::spgOptions)
+function project{Tx<:Number}(x::AbstractArray{Tx}, tau::Number, timeProject::AbstractArray,
+                    options::spgOptions, params::Dict)
     
-    (options.verbosity == 1) && println("Being Project")
+    (options.verbosity == 1) && println("Begin Project")
 
-    #DEVNOTE# Might not need this if-else since using params dict
-    if (string(options.project)=="GenSPGL.TraceNorm_project")
-        x,itn = options.project(x, tau, options.weights.params) 
-    else
-        x,itn = options.project(x, tau, options.weights)
-    end
+    x_out::typeof(x), itn::Int = options.project(x, tau, options.weights, params) 
  
     #DEVNOTE# Replace with @elapsed at call #timeProject[1] += (toc() - tStart)
 
     (options.verbosity == 1) && println("Finish Project")
     
-    return x,itn
+    return x_out,itn
 
 end
 

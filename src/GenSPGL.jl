@@ -9,8 +9,10 @@ include("spgExitCondition.jl")
 
 # Methods
 include("spgl1.jl")
+include("spglcore.jl")
 include("spg_lasso.jl")
 include("NormL1_project.jl")
+include("NormL1_dual.jl")
 include("oneprojector.jl")
 
 # Penalties
