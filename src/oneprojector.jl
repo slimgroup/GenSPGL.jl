@@ -63,7 +63,7 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
     end
 
     # Get sign of b and set to absolute values
-    b_abs = abs(b)
+    b_abs = abs.(b)
 
     # Perform projection
     if len_d==1
@@ -124,7 +124,7 @@ function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::Abstra
     end
 
     # Set the solution by apply soft-thresholding with previous value of alpha
-    x[idx] = max(0, b_sort .- alphaprev)
+    x[idx] = max.(0, b_sort .- alphaprev)
 
     # Set number of iterations
     itn = j_out

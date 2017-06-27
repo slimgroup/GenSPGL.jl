@@ -109,7 +109,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     # versions we also checked if the number of weights was equal to
     # n. In the case of multiple measurement vectors, this no longer
     # needs to apply, so the check was removed.
-    any(isinf(options.weights)) && error("Weights must be finite")
+    any(isinf.(options.weights)) && error("Weights must be finite")
     any(options.weights .> 0) || error("Weights must be strictly positive")
     
     # Quick exit if sigma >= ||b||. Set Tau = 0 to short circuit the loop
@@ -220,7 +220,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     timeProject)
                     
     # Wrap main loop in a function to ease type stability
-    @code_warntype spglcore(init)
+    spglcore(init)
 
     return init
 end #func
