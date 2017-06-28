@@ -8,11 +8,11 @@ export NormL1_project
 Use: x,itn = NormL1_project(x,weights,tau)
 
 """
-function NormL1_project{Tx<:Real}(x::AbstractVector{Tx}, tau::Number, weights, params)
+function NormL1_project{ETx<:Number,Tx<:AbstractVector{ETx}}(x::Tx, tau::Number, weights, params)
 
     println("Script made it into NORML1_project for real x")
     
-    x_out,itn = oneprojector(x, weights, tau)
+    x_out::Tx,itn::Int64 = oneprojector(x, weights, tau)
     
     return x_out,itn
 end

@@ -63,10 +63,10 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     nNewton = 0;
     bNorm, b_normalized = options.funPenalty(b, params)
     stat = false
-    timeProject = Float64[0]
-    timeMatProd = Float64[0]
+    timeProject = zero(Float64)
+    timeMatProd = zero(Float64)
     nnzIter = 0             # No. of Its with fixed pattern
-    nnzIdx = []             # Active set indicator
+    nnzIdx = 0             # Active set indicator
     subspace = false        # Flag if did subspace min in current itn
     stepG = 1               # Step length for projected gradient
     testUpdateTau = 0
@@ -228,21 +228,21 @@ end #func
 
 
 """
-Use:    x = project(x::AbstractArray, tau::Number, timeProject::AbstractArray,
+Use:    x = project(x::AbstractArray, tau::Number, timeProject::Float64
                     options::spgOptions, params::Dict)
 """
-function project{Tx<:Number}(x::AbstractArray{Tx}, tau::Number, timeProject::AbstractArray,
+function project{ETx<:Number, Tx<:AbstractVector{ETx}}(x::Tx, tau::Number, timeProject::Float64,
                     options::spgOptions, params::Dict)
     
     (options.verbosity == 1) && println("Begin Project")
 
-    x_out::typeof(x), itn::Int = options.project(x, tau, options.weights, params) 
+    x_out::Tx, itn::Int64 = options.project(x, tau, options.weights, params) 
  
     #DEVNOTE# Replace with @elapsed at call #timeProject[1] += (toc() - tStart)
 
     (options.verbosity == 1) && println("Finish Project")
     
-    return x_out,itn
+    return x_out, itn
 
 end
 
