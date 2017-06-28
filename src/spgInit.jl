@@ -8,7 +8,7 @@ GenSPGL Initialized local vars composite type. \n
 Passed to spglcore.jl
 
 """
-type spgInit{Txg<:Float64, T<:Int64}
+type spgInit{Txg<:Float64}
 
     x::AbstractVector{Txg}
     tau::Txg
@@ -16,9 +16,9 @@ type spgInit{Txg<:Float64, T<:Int64}
     g::AbstractVector{Txg}
     g2::Txg
     f::Txg
-    nnzIdx::T
+    nnzIdx::BitArray{1}
     options::spgOptions
-    params::Dict
+    params::Dict{String,Number}
     timeProject::Txg
     
 end

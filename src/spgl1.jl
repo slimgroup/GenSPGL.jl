@@ -65,8 +65,8 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     stat = false
     timeProject = zero(Float64)
     timeMatProd = zero(Float64)
-    nnzIter = 0             # No. of Its with fixed pattern
-    nnzIdx = 0             # Active set indicator
+    nnzIter = BitArray{1}() # No. of Its with fixed pattern
+    nnzIdx = BitArray{1}()  # Active set indicator
     subspace = false        # Flag if did subspace min in current itn
     stepG = 1               # Step length for projected gradient
     testUpdateTau = 0
@@ -220,7 +220,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     timeProject)
                     
     # Wrap main loop in a function to ease type stability
-    spglcore(init)
+    @time spglcore(init)
 
     return init
 end #func
