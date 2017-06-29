@@ -65,11 +65,11 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     stat = false
     timeProject = zero(Float64)
     timeMatProd = zero(Float64)
-    nnzIter = BitArray{1}() # No. of Its with fixed pattern
+    nnzIter = zero(Int64) # No. of Its with fixed pattern
     nnzIdx = BitArray{1}()  # Active set indicator
     subspace = false        # Flag if did subspace min in current itn
     stepG = 1               # Step length for projected gradient
-    testUpdateTau = 0
+    testUpdateTau = false
 
     ##-------------------------------------------------------------------------------
     # End Init
@@ -200,10 +200,10 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     end
 
     # Required for non-monotone strategy
-    lastFv[1] = f
-    fBest = f
-    xBest = x
-    fOld = f
+    lastFv[1] = copy(f)
+    fBest = copy(f)
+    xBest = copy(x)
+    fOld = copy(f)
 
     println("Init Finished")
 
@@ -215,12 +215,20 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     g2,
                     f,
                     nnzIdx,
+                    nnzIter,
                     options,
                     params,
-                    timeProject)
+                    timeProject,
+                    exit_status,
+                    singleTau,
+                    bNorm,
+                    fOld,
+                    testUpdateTau,
+                    iter,
+                    nNewton)
                     
     # Wrap main loop in a function to ease type stability
-    @time spglcore(init)
+    @code_warntype spglcore(init)
 
     return init
 end #func
