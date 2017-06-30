@@ -8,24 +8,31 @@ GenSPGL Initialized local vars composite type. \n
 Passed to spglcore.jl
 
 """
-type spgInit{Txg<:Float64,Tidx<:BitArray}
+type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
 
-    x::AbstractVector{Txg}
-    tau::Txg
-    sigma::Txg
-    g::AbstractVector{Txg}
-    g2::Txg
-    f::Txg
+    x::Txg
+    tau::ETxg
+    sigma::ETxg
+    g::Txg
+    g2::ETxg
+    f::ETxg
+    r::Txg
     nnzIdx::Tidx
     nnzIter::Int64
     options::spgOptions
     params::Dict{String,Number}
-    timeProject::Txg
+    timeProject::ETxg
     exit_status::spgExitCondition  
     singleTau::Bool
-    bNorm::Txg
-    fOld::Txg
+    bNorm::ETxg
+    fOld::ETxg
     testUpdateTau::Bool
     iter::Int64
     nNewton::Int64
+    printTau::Bool
+    subspace::Bool
+    stepG::ETxg
+    xNorm1::Vector{ETxg}
+    rNorm2::Vector{ETxg}
+    lambda::Vector{ETxg}
 end

@@ -14,6 +14,7 @@ include("spglcore.jl")
 include("spg_lasso.jl")
 include("NormL1_project.jl")
 include("NormL1_dual.jl")
+include("NormL1_primal.jl")
 include("oneprojector.jl")
 
 # Penalties

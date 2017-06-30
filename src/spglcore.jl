@@ -5,7 +5,7 @@ Use: spglcore()
 
 Main loop of spgl1.jl
 """
-function spglcore{Txg<:Number, Tidx<:BitArray}(init::spgInit{Txg, Tidx})
+function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init::spgInit{ETxg, Txg, Tidx})
 
     #DEVNOTE# Create spgInit type to hold all these initialized paramaters
     
@@ -19,9 +19,10 @@ function spglcore{Txg<:Number, Tidx<:BitArray}(init::spgInit{Txg, Tidx})
     #Main Loop
     while true
 
+        # ================================================================================
         # Test Exit Conditions
         # ================================================================================ 
-        gNorm::Txg = zero(Txg)
+        gNorm::ETxg = zero(ETxg)
 
         if (options.proxy)
             gNorm = options.dual_norm(init.g2, options.weights, init.params)
@@ -32,28 +33,20 @@ function spglcore{Txg<:Number, Tidx<:BitArray}(init::spgInit{Txg, Tidx})
         # rNorm and f are the same thing
         rNorm = init.f
 
-        tmp_proj::Array{Txg,1},tmp_itn::Int64 = project(init.x - init.g,
+        tmp_proj::Txg,tmp_itn::Int64 = project(init.x - init.g,
                                         init.tau, init.timeProject, options, params)
-        Err::Txg = norm(init.x - tmp_proj)
-        rErr::Txg = Err/max(1,init.f)
+        Err::ETxg = norm(init.x - tmp_proj)
+        rErr::ETxg = Err/max(1,init.f)
    
         aError1 = rNorm - init.sigma
         aError2 = rNorm^2 - init.sigma^2
-        rError1 = abs(aError1) / max(1,rNorm)
-        rError2 = abs(aError2) / max(1,init.f)
+
 
         # Count number of consecutive iterations with identical support
         
         nnzOld::Tidx = deepcopy(init.nnzIdx) #DEVNOTE# Not stable, but shouldnt be a big deal
         nnzX,nnzG,init.nnzIdx,nnzDiff = activevars(init.x, init.g, init.nnzIdx, options, params)
       
-        println("""
-        nnzX:       $nnzX\n
-        nnzG:       $nnzG\n
-        nnzIdx:     $(init.nnzIdx)\n
-        nnzDiff:    $nnzDiff\n
-        """)
-        
         if (nnzDiff == -1)
             init.nnzIter = 0
         end
@@ -103,7 +96,7 @@ function spglcore{Txg<:Number, Tidx<:BitArray}(init::spgInit{Txg, Tidx})
 
             if testUpdateTau
 
-                if (options.quitPareto & iter >= minPareto) 
+                if (options.quitPareto & init.iter >= minPareto) 
                     init.exit_status.triggered = 10
                 end
 
@@ -112,7 +105,7 @@ function spglcore{Txg<:Number, Tidx<:BitArray}(init::spgInit{Txg, Tidx})
                 init.nNewton += one(typeof(init.nNewton))
                 
                 #DEVNOTE# Unstable, but may remove later
-                printTau = (abs(tauOld - init.tau) >= 1e-6 * init.tau)::Bool 
+                init.printTau = (abs(tauOld - init.tau) >= 1e-6 * init.tau)::Bool 
 
                 if tau < tauOld
                     init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
@@ -128,6 +121,67 @@ function spglcore{Txg<:Number, Tidx<:BitArray}(init::spgInit{Txg, Tidx})
 
         (options.verbosity == 1) && println("fin CheckConverge")
 
+        # ===============================================================================
+        # Print log, update history, and check exit conditions
+        # ===============================================================================
+
+        if (options.verbosity == 1) | init.singleTau | init.printTau |
+                                 (init.iter == 0) | ~isnull(init.exit_status.triggered)
+
+            if init.singleTau
+                
+                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr rNorm log10(init.stepG) nnzX nnzG
+                println(s)
+
+                if init.subspace
+                    println("$itnLSQR")
+                end
+            else
+                
+                #DEVNOTE# Check ML ver. This line should be different
+                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr rNorm log10(init.stepG) nnzX nnzG
+                println(s)
+                if init.printTau | init.subspace
+                    println("$Tau   $itnLSQR\n")
+                end
+            end
+
+        end
+
+        init.printTau = false
+        init.subspace = false
+
+        #Update History
+        if isempty(init.x)
+            init.xNorm1[init.iter+1] = 0.
+        else
+            init.xNorm1[init.iter+1] = options.primal_norm(init.x, options.weights, params)
+        end
+        init.rNorm2[init.iter+1] = copy(rNorm)
+        init.lambda[init.iter+1] = copy(gNorm)
+        
+        # ================================================================================
+        # Begin Iterations
+        # ================================================================================
+        init.iter += 1
+        xOld = copy(init.x)
+        fOld = copy(init.f)
+        rOld = copy(init.r)
+       
+        try
+            # ================================================================================
+            # Projected gradient step and line search
+            # ================================================================================
+
+            println("begin LineSearch")
+
+
+
+        catch
+
+
+
+        end
 
         break #DEVNOTE# Remove this when done main loop
    

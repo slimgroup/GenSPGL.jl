@@ -59,7 +59,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     nProdA = [0]; nProdAt = [0]
     lastFv = [-Inf for i=1:options.nPrevVals] # Last m functions values
     nLineTot = 0            # Total number of linesearch steps
-    pintTau = false
+    printTau = false
     nNewton = 0;
     bNorm, b_normalized = options.funPenalty(b, params)
     stat = false
@@ -68,7 +68,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     nnzIter = zero(Int64) # No. of Its with fixed pattern
     nnzIdx = BitArray{1}()  # Active set indicator
     subspace = false        # Flag if did subspace min in current itn
-    stepG = 1               # Step length for projected gradient
+    stepG = 1.0               # Step length for projected gradient
     testUpdateTau = false
 
     ##-------------------------------------------------------------------------------
@@ -214,6 +214,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     g,
                     g2,
                     f,
+                    r,
                     nnzIdx,
                     nnzIter,
                     options,
@@ -225,10 +226,16 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     fOld,
                     testUpdateTau,
                     iter,
-                    nNewton)
+                    nNewton,
+                    printTau,
+                    subspace,
+                    stepG,
+                    xNorm1,
+                    rNorm2,
+                    lambda)
                     
     # Wrap main loop in a function to ease type stability
-    @code_warntype spglcore(init)
+    spglcore(init)
 
     return init
 end #func
