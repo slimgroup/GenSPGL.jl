@@ -67,10 +67,10 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
 
     # Perform projection
     if len_d==1
-        
-        println("$(typeof(oneprojectormex(b_abs, d[1], tau)))")
+       
         x,itn = oneprojectormex(b_abs, d[1], tau)
         return x,itn
+
     else
         
         d_abs = abs(d)

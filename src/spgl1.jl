@@ -1,6 +1,6 @@
 # SPGL
 
-export spgl1, project
+export spgl1, project, SpotFunForward
 
 """
 This will contain info on use of spgl1
