@@ -9,7 +9,9 @@ Passed to spglcore.jl
 
 """
 type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
-
+    
+    A::AbstractArray
+    b::AbstractVector
     x::Txg
     tau::ETxg
     sigma::ETxg
@@ -21,7 +23,7 @@ type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
     nnzIter::Int64
     options::spgOptions
     params::Dict{String,Number}
-    timeProject::ETxg
+    timeProject::Float64
     exit_status::spgExitCondition  
     singleTau::Bool
     bNorm::ETxg
@@ -35,4 +37,6 @@ type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
     xNorm1::Vector{ETxg}
     rNorm2::Vector{ETxg}
     lambda::Vector{ETxg}
+    lastFv::Vector{Float64} # Has to be Float64 to support Inf
+    gStep::ETxg
 end

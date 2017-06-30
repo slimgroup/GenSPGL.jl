@@ -208,7 +208,9 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     println("Init Finished")
 
     # Wrap up initialized variables
-    init = spgInit(x,
+    init = spgInit(A,
+                    b,
+                    x,
                     tau,
                     sigma,
                     g,
@@ -232,7 +234,9 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     stepG,
                     xNorm1,
                     rNorm2,
-                    lambda)
+                    lambda,
+                    lastFv,
+                    gStep)
                     
     # Wrap main loop in a function to ease type stability
     spglcore(init)

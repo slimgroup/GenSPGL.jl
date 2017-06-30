@@ -1,11 +1,15 @@
-export spgllinecurvy
+export spglinecurvy
 
 """
-Use: fNew,xNew,rNew,iter,step,err, nProd = spgLineCurvy(x,g,fMax,funForward, funPenalty, b,project,tau, params)\n
+Use: fNew,xNew,rNew,iter,step,err, nProd = spglinecurvy(x,g,fMax,funForward, funPenalty, b,project,tau, params)\n
 Projected backtracking linesearch. On entry, g is the (possibly scaled) steepest
 descent direction. 
 """
-function spglinecurvy{Tf<:Number, ETxg<:Number, Txg<:AbstractVector{ETxg}}(A, x::Txg, g::Txg, fMax::Tf, funForward, funPenalty, b, project, timeProject, tau::Float64, options, params)
+function spglinecurvy{Tf<:Number, ETxg<:Number, Txg<:AbstractVector{ETxg}}(A::AbstractArray, 
+                                    x::Txg, g::Txg, fMax::Tf, funForward::Function,
+                                    funPenalty::Function, b::AbstractVector, 
+                                    project::Function, timeProject::Float64, tau::Float64, 
+                                    options::spgOptions, params::Dict{String,Number})
 
     println("Script entered spglinecurvy")
 
@@ -37,9 +41,6 @@ function spglinecurvy{Tf<:Number, ETxg<:Number, Txg<:AbstractVector{ETxg}}(A, x:
         fNew, dummy_g = funPenalty(rNew, params)
 
         s = xNew - x
-        println("g':", g')
-        println("s: ", s)
-        println("g'*s:", g'*s)
         gts = scale * real(g'*s)
 
         if gts >= 0
