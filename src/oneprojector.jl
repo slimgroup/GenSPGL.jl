@@ -63,13 +63,13 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
     end
 
     # Get sign of b and set to absolute values
+    s = sign.(b)
     b_abs = abs.(b)
 
     # Perform projection
     if len_d==1
        
         x,itn = oneprojectormex(b_abs, d[1], tau)
-        return x,itn
 
     else
         
@@ -77,8 +77,11 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
         idx = find(d .> eps())
         x = deepcopy(b_abs) #DEVNOTE# Double check avoiding referencing is necessary
         x[idx],itn = oneprojectormex(b_abs[idx], d[idx], tau)
-        return x,itn
     end
+   
+    # Restore signs of x
+    x .*= s
+    return x,itn
 end
 
 

@@ -5,7 +5,7 @@ Use: fNew,xNew,rNew,iter,step,err, nProd = spgLineCurvy(x,g,fMax,funForward, fun
 Projected backtracking linesearch. On entry, g is the (possibly scaled) steepest
 descent direction. 
 """
-function spglinecurvy{ETxg<:Number, Txg<:AbstractVector{ETxg}}(A, x::Txg, g::Txg, fMax, funForward, funPenalty, b, project, timeProject, tau::Float64, options, params)
+function spglinecurvy{Tf<:Number, ETxg<:Number, Txg<:AbstractVector{ETxg}}(A, x::Txg, g::Txg, fMax::Tf, funForward, funPenalty, b, project, timeProject, tau::Float64, options, params)
 
     println("Script entered spglinecurvy")
 
@@ -27,8 +27,8 @@ function spglinecurvy{ETxg<:Number, Txg<:AbstractVector{ETxg}}(A, x::Txg, g::Txg
     # Define outputs outside of while loop scope
     xNew = similar(x)
     rNew = Vector{ETxg}()
-    fNew = fMax
-    err = 0
+    fNew = zero(Tf)
+    err = -1
     while true
 
         xNew, tmp_itr = project(x - step*scale*g, tau, timeProject, options, params)
@@ -36,9 +36,10 @@ function spglinecurvy{ETxg<:Number, Txg<:AbstractVector{ETxg}}(A, x::Txg, g::Txg
         nProd += 1
         fNew, dummy_g = funPenalty(rNew, params)
 
-        println("xNew: $xNew\n rNew: $rNew\n fNew: $fNew")
-
         s = xNew - x
+        println("g':", g')
+        println("s: ", s)
+        println("g'*s:", g'*s)
         gts = scale * real(g'*s)
 
         if gts >= 0
