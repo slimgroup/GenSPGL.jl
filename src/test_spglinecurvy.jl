@@ -17,4 +17,4 @@ timeProject = zero(Float64)
 options = spgOptions()
 A = var["A"]
 
-fNew, xNew, rNew, iter, step, err, nProd = spglinecurvy(A, x, gStep*g, maximum(lastFv), SpotFunForward, funLS, b, project, timeProject, tau, options, params)
+spglinecurvy(A, x, gStep*g, maximum(lastFv), SpotFunForward, funLS, b, project, timeProject, tau, options, params)

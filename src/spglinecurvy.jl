@@ -5,11 +5,19 @@ Use: fNew,xNew,rNew,iter,step,err, nProd = spglinecurvy(x,g,fMax,funForward, fun
 Projected backtracking linesearch. On entry, g is the (possibly scaled) steepest
 descent direction. 
 """
-function spglinecurvy{Tf<:Number, ETxg<:Number, Txg<:AbstractVector{ETxg}}(A::AbstractArray, 
-                                    x::Txg, g::Txg, fMax::Tf, funForward::Function,
-                                    funPenalty::Function, b::AbstractVector, 
-                                    project::Function, timeProject::Float64, tau::Float64, 
-                                    options::spgOptions, params::Dict{String,Number})
+function spglinecurvy{Tf<:Number, ETxg<:AbstractFloat, Txg<:AbstractVector{ETxg}}(
+                                    A::AbstractArray, 
+                                    x::Txg, 
+                                    g::Txg, 
+                                    fMax::Tf, 
+                                    funForward::Function,
+                                    funPenalty::Function,
+                                    b::AbstractVector, 
+                                    project::Function,
+                                    timeProject::Float64,
+                                    tau::Float64, 
+                                    options::spgOptions,
+                                    params::Dict{String,Number})
 
     println("Script entered spglinecurvy")
 
@@ -20,9 +28,9 @@ function spglinecurvy{Tf<:Number, ETxg<:Number, Txg<:AbstractVector{ETxg}}(A::Ab
     EXIT_NODESCENT = 2
     gamma = 1e-4
     maxIts = 10
-    step = 1
-    sNorm = 0
-    scale = 1
+    step = one(ETxg)
+    sNorm = zero(ETxg)
+    scale = one(ETxg)
     nSafe = 0
     iter = 0
     debug = false
@@ -30,13 +38,13 @@ function spglinecurvy{Tf<:Number, ETxg<:Number, Txg<:AbstractVector{ETxg}}(A::Ab
 
     # Define outputs outside of while loop scope
     xNew = similar(x)
-    rNew = Vector{ETxg}()
+    rNew = Array{ETxg,1}()
     fNew = zero(Tf)
     err = -1
     while true
 
         xNew, tmp_itr = project(x - step*scale*g, tau, timeProject, options, params)
-        rNew = b - funForward(A, xNew, [], params)
+        rNew = b - funForward(A, xNew, [], params)::Array{ETxg,1}
         nProd += 1
         fNew, dummy_g = funPenalty(rNew, params)
 

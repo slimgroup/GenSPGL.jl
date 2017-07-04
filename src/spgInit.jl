@@ -39,4 +39,5 @@ type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
     lambda::Vector{ETxg}
     lastFv::Vector{Float64} # Has to be Float64 to support Inf
     gStep::ETxg
+    funForward::Function
 end

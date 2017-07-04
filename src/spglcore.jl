@@ -175,24 +175,20 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
             println("begin LineSearch")
 
-            #fNew, xNew, rNew, iter, step, err, nProd = spglinecurvy(init.A, init.x, 
-                                                #init.gStep*init.g, maximum(init.lastFv),
-                                                #options.funPenalty, init.b, project, 
-                                                #init.timeProject, init.tau, options, params)        
-            spglinecurvy(init.A, init.x, 
-                                                init.gStep*init.g, maximum(init.lastFv),
-                                                options.funPenalty, init.b, project, 
-                                                init.timeProject, init.tau, options, params)            
+            f, x, r, nLine, stepG, lnErr, localProdA = spglinecurvy(init.A,
+                                                                    init.x, 
+                                                                    init.gStep*init.g,
+                                                                    maximum(init.lastFv),
+                                                                    init.funForward,
+                                                                    options.funPenalty,
+                                                                    init.b,
+                                                                    project, 
+                                                                    init.timeProject,
+                                                                    init.tau,
+                                                                    options,
+                                                                    params)            
             
-            println("""
-            fNew: $fNew\n
-            xNew: $xNew\n
-            rNew: $rNew\n
-            iter: $iter\n
-            step: $step\n
-            err: $err\n
-            nProd: $nProd\n
-            """)
+
         catch exc
             println("""
             ===============================CAUGHT_ERROR===================================== 

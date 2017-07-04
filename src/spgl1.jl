@@ -236,7 +236,8 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     rNorm2,
                     lambda,
                     lastFv,
-                    gStep)
+                    gStep,
+                    funForward)
                     
     # Wrap main loop in a function to ease type stability
     spglcore(init)
