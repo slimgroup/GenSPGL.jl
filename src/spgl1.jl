@@ -237,7 +237,9 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     lambda,
                     lastFv,
                     gStep,
-                    funForward)
+                    funForward,
+                    nLineTot,
+                    nProdAt)
                     
     # Wrap main loop in a function to ease type stability
     spglcore(init)
@@ -271,7 +273,7 @@ end
 """
 GenSPGL
 
-Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params, nProdAt, params)
+Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
 """
 function funCompositeR(A::AbstractArray,x::AbstractArray,r::AbstractArray,
                         funForward::Function, funPenalty::Function, 

@@ -175,7 +175,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
             println("begin LineSearch")
 
-            f, x, r, nLine, stepG, lnErr, localProdA = spglinecurvy(init.A,
+            init.f, init.x, init.r, nLine, stepG, lnErr, localProdA = spglinecurvy(init.A,
                                                                     init.x, 
                                                                     init.gStep*init.g,
                                                                     maximum(init.lastFv),
@@ -188,8 +188,83 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                                                                     options,
                                                                     params)            
             
+            println("fin LineSearch")
+            init.nLineTot += nLine
+            
+            if lnErr == -1
+                warn("Line Search Error not set in call to spglinecurvy")
+            end
+
+            # If an error was triggered in the line search
+            if (lnErr !== 0)
+                #DEVNOTE# Finish this if statement
+                throw(error("SPGLine Error in development"))
+
+                println("begin FeasLineSearch")
+
+                # Projected backtrack failed. Retry with feasible dir'n line search
+                init.x = xOld
+
+                # In-place scaling of gradient and updating of x
+                if ~isempty(xOld)
+                    dx = project(xOld - init.gStep.*init.g, init.tau, init.timeProject,
+                                                            options, params)[1] - xOld
+                else
+                    throw(error("Empty X")) # This should never be invoked 
+                end
+
+                gtd = dot(g,dx)
+            end
+            
+            # Failed again, Revert to Previous iterates and damp max BB step
+            if (lnErr !== 0)
+                options.stepMax /= 10
+                println("Line Search Failed") #DEVNOTE# Include more info
+            end
+
+
+            doSubspaceMin = false
+            if options.subspaceMin
+                throw(error("subspaceMin is in development"))
+            end
+
+            primNorm_x = options.primal_norm(init.x,options.weights,params)
+            targetNorm = init.tau + options.optTol
+
+            if options.ignorePErr
+
+                if primNorm_x > targetNorm
+                    warn("Primal norm of projected x is larger than expected")
+                end
+                
+            end
+
+            println("fin UpdateX")
+
+            gOld = copy(init.g) 
+
+            init.f, init.g, init.g2 = funCompositeR(init.A, init.x, init.r, init.funForward,
+            options.funPenalty, init.nProdAt, params)
+
+            # xOld plays the role of s
+            xOld = init.x - xOld
+
+            y = init.g - gOld
+            sts = dot(xOld,xOld)
+            sty = dot(xOld,y)
+
+            if sty <= 0
+                gStep = options.stepMax
+            else
+                gStep = min(options.stepMax,max(options.stepMin, sts/sty))
+            end
+
+            println("fin CompScaling")
+
 
         catch exc
+            
+            #DEVNOTE# Add in MaxMatVec error catch
             println("""
             ===============================CAUGHT_ERROR===================================== 
             """)
@@ -200,9 +275,21 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             """)
         end
 
+        # ================================================================================
+        # Update Function History
+        # ================================================================================
+
+        # Dont update if superoptimal 
+        if init.singleTau | (init.f > init.sigma)
+            init.lastFv[mod(init.iter, options.nPrevVals)+1] = init.f
+            println("lastFV: $(init.lastFv)")
+        end
+
+
+
+
+
         break #DEVNOTE# Remove this when done main loop
-   
-        
     end #Main Loop
 
 end

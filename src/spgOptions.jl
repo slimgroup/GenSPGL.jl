@@ -135,7 +135,7 @@ Arguments:\n
 function spgOptions(;fid::Integer = 1,
                         verbosity::Integer = 1,
                         iterations::Integer = 100000,
-                        nPrevVals::Integer = 10,
+                        nPrevVals::Integer = 3,
                         bpTol::Number = 1e-6,
                         lsTol::Number = 1e-6,
                         optTol::Number = 1e-4,
