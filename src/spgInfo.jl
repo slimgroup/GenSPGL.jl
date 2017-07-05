@@ -8,21 +8,22 @@ GenSPGL output vars composite type. \n
 Passed to spgl1.jl from spglcore.jl
 
 """
-type spgInfo
+type spgInfo{ETxg<: AbstractFloat, Txg<:AbstractVector{ETxg}}
    
-    tau
-    rNorm
-    gNorm
-    rErr
-    exit_status
-    iter
-    nProdA
-    nProdAt
-    nNewton
-    timeProject
-    timeMatProd
-    options
-    xNorm1
-    rNorm2
-    lambda
+    tau::ETxg
+    rNorm::ETxg
+    gNorm::ETxg
+    rErr::ETxg
+    exit_status::spgExitCondition
+    iter::Int64
+    nProdA::Int64
+    nProdAt::Int64
+    nNewton::Int64
+    timeProject::ETxg
+    timeMatProd::ETxg
+    options::spgOptions
+    xNorm1::Txg
+    rNorm2::Txg
+    lambda::Txg
+
 end

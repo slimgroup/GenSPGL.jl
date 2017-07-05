@@ -67,7 +67,6 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
 
     # Perform projection
     if len_d==1
-       
         x,itn = oneprojectormex(b_abs, d[1], tau)
 
     else
@@ -91,7 +90,6 @@ oneprojectormex_I clone
 """
 function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::AbstractFloat)
 
-    
     tau = tau/abs(d)
     len_b = length(b)
     
@@ -102,8 +100,8 @@ function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::Abstra
 
     #Check for quick exit
     (tau >= bNorm) && (x=b; itn=0; return x,itn)
-    (tau < eps()) && (itn = 0; return itn)
-
+    (tau < eps()) && (itn = zero(Int64); return x,itn)
+    
     # Preprocessing (b is assumed to be >= 0)
     idx = sortperm_col(b, rev=true)
     b_sort = b[idx]
@@ -123,7 +121,7 @@ function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::Abstra
 
         j_out = j
     end
-
+    
     # Set the solution by apply soft-thresholding with previous value of alpha
     x[idx] = max.(0, b_sort .- alphaprev)
 

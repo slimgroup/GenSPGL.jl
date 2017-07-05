@@ -5,3 +5,8 @@ load('vars_lasso.mat')
 tic;
 x = spg_lasso(A, b, tau);
 toc;
+
+display('------------- Basis Pursuit --------------')
+
+opts = spgSetParms('verbosity',2);
+[x,r,g,info] = spg_bp(A, b, opts);

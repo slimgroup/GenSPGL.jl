@@ -43,7 +43,8 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
    
         aError1 = rNorm - init.sigma
         aError2 = rNorm^2 - init.sigma^2
-
+        rError1 = abs(aError1) / max(1,rNorm)
+        rError2 = abs(aError2) / max(1,init.f)
 
         # Count number of consecutive iterations with identical support
         
@@ -76,7 +77,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 init.exit_status.triggered = 3
             end
 
-            if (rErr <= max(options.optTol, rError2)) | rError1 <= optTol
+            if (rErr <= max(options.optTol, rError2)) | (rError1 <= options.optTol)
 
                 # Problem is nearly optimal for current tau
                 # Check optimailty of current root
@@ -92,25 +93,25 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
             testRelChange1 = (abs(init.f - init.fOld) <= options.decTol * init.f)::Bool
             testRelChange2 = (abs(init.f - init.fOld) <= 1e-1*init.f*(abs(rNorm - init.sigma)))
-            init.testUpdateTau = ((testRelChange1 & rNorm >  2*init.sigma) |
-                            (testRelChange2 & rNorm <= 2*init.sigma)) &
+            init.testUpdateTau = ((testRelChange1 & (rNorm >  2*init.sigma)) |
+                            (testRelChange2 & (rNorm <= 2*init.sigma))) &
                             isnull(init.exit_status.triggered) &
                             ~init.testUpdateTau
 
-            if testUpdateTau
+            if init.testUpdateTau
 
-                if (options.quitPareto & init.iter >= minPareto) 
+                if (options.quitPareto & (init.iter >= options.minPareto)) 
                     init.exit_status.triggered = 10
                 end
 
                 tauOld = copy(init.tau)
-                init.tau = max(zero(typeof(init.tau)), tau + (aError1)/ gNorm)::typeof(tauOld)
+                init.tau = max(zero(typeof(init.tau)), init.tau + (aError1)/ gNorm)::typeof(tauOld)
                 init.nNewton += one(typeof(init.nNewton))
                 
                 #DEVNOTE# Unstable, but may remove later
                 init.printTau = (abs(tauOld - init.tau) >= 1e-6 * init.tau)::Bool 
 
-                if tau < tauOld
+                if init.tau < tauOld
                     init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
                 end
 
@@ -137,7 +138,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 (options.verbosity > 0) && println(s)
 
                 if init.subspace
-                    println("$itnLSQR")
+                    #println("$itnLSQR")
                 end
             else
                 
@@ -146,7 +147,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 (options.verbosity > 0) && println(s)
 
                 if init.printTau | init.subspace
-                    println("$Tau   $itnLSQR\n")
+                    println("$(init.tau)")#   $itnLSQR\n")
                 end
             end
 
@@ -204,6 +205,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             # If an error was triggered in the line search
             if (lnErr !== 0)
                 #DEVNOTE# Finish this if statement
+                println("Line Error: $(lnErr)")
                 throw(error("SPGLine Error in development"))
 
                 (options.verbosity > 1) && println("begin FeasLineSearch")

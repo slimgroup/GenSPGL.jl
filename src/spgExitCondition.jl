@@ -60,7 +60,7 @@ Prints the triggered exit condition reached in spgl1.\n
 function print(ec::spgExitCondition)
 
     if isnull(ec.triggered)
-        println("Trigger is null. No exit condition reached in spgl1.")
+        println("Null Trigger. No exit condition reached in spgl1.")
     else
         val = ec.triggered.value
         reason = ec.conditions[val]

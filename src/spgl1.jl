@@ -57,7 +57,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     # Initialize Local Variables
     ##--------------------------------------------------------------------------------  
     iter = 0; itnTotLSQR = 0#Total SPGL1 and LSQR iterations.
-    nProdA = [0]; nProdAt = [0]
+    nProdA = 0; nProdAt = 0
     lastFv = [-Inf for i=1:options.nPrevVals] # Last m functions values
     nLineTot = 0            # Total number of linesearch steps
     printTau = false
@@ -195,7 +195,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
        
     dxNorm = norm(dx,Inf)
     if dxNorm < (1/options.stepMax)
-        gStep = stepMax
+        gStep = options.stepMax
     else
         gStep = min(options.stepMax, max(options.stepMin, 1/dxNorm))
     end
@@ -304,10 +304,10 @@ Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
 """
 function funCompositeR(A::AbstractArray,x::AbstractArray,r::AbstractArray,
                         funForward::Function, funPenalty::Function, 
-                        nProdAt::AbstractArray,
+                        nProdAt::Int64,
                         params::Dict{String,Number})
 
-    nProdAt[1] += one(eltype(nProdAt))
+    nProdAt += one(Int64)
     f,v = funPenalty(r, params)
     
     if ~(params["proxy"])
