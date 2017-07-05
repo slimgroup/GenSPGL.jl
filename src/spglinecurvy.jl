@@ -19,7 +19,7 @@ function spglinecurvy{Tf<:Number, ETxg<:AbstractFloat, Txg<:AbstractVector{ETxg}
                                     options::spgOptions,
                                     params::Dict{String,Number})
 
-    println("Script entered spglinecurvy")
+    (options.verbosity > 1) && println("Script entered spglinecurvy")
 
     nProd = 0
     nProdAt = 0

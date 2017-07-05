@@ -9,7 +9,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
     #DEVNOTE# Create spgInit type to hold all these initialized paramaters
     
-    println("script has entered spglcore\n 
+    (init.options.verbosity > 1) && println("script has entered spglcore\n 
             Begin Main Loop.")
 
     # Pull out options type for easier use
@@ -51,7 +51,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             init.nnzIter = 0
         end
 
-        options.verbosity == 1 && println("fin CompConditions")
+        options.verbosity > 1 && println("fin CompConditions")
         
         if isempty(init.x)
             println("DEVNOTE x is empty in spglcore, check spgl1 90-99")
@@ -119,19 +119,19 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             init.exit_status.triggered = 5 
         end
 
-        (options.verbosity == 1) && println("fin CheckConverge")
+        (options.verbosity > 1) && println("fin CheckConverge")
 
         # ===============================================================================
         # Print log, update history, and check exit conditions
         # ===============================================================================
 
-        if (options.verbosity == 1) | init.singleTau | init.printTau |
+        if (options.verbosity > 0) | init.singleTau | init.printTau |
                                  (init.iter == 0) | ~isnull(init.exit_status.triggered)
 
             if init.singleTau
                 
                 s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr rNorm log10(init.stepG) nnzX nnzG
-                println(s)
+                (options.verbosity > 0) && println(s)
 
                 if init.subspace
                     println("$itnLSQR")
@@ -140,7 +140,8 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 
                 #DEVNOTE# Check ML ver. This line should be different
                 s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr rNorm log10(init.stepG) nnzX nnzG
-                println(s)
+                (options.verbosity > 0) && println(s)
+
                 if init.printTau | init.subspace
                     println("$Tau   $itnLSQR\n")
                 end
@@ -173,7 +174,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             # Projected gradient step and line search
             # ================================================================================
 
-            println("begin LineSearch")
+            (options.verbosity > 1) && println("begin LineSearch")
 
             init.f, init.x, init.r, nLine, stepG, lnErr, localProdA = spglinecurvy(init.A,
                                                                     init.x, 
@@ -188,7 +189,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                                                                     options,
                                                                     params)            
             
-            println("fin LineSearch")
+            (options.verbosity > 1) && println("fin LineSearch")
             init.nLineTot += nLine
             
             if lnErr == -1
@@ -200,7 +201,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 #DEVNOTE# Finish this if statement
                 throw(error("SPGLine Error in development"))
 
-                println("begin FeasLineSearch")
+                (options.verbosity > 1) && println("begin FeasLineSearch")
 
                 # Projected backtrack failed. Retry with feasible dir'n line search
                 init.x = xOld
@@ -219,7 +220,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             # Failed again, Revert to Previous iterates and damp max BB step
             if (lnErr !== 0)
                 options.stepMax /= 10
-                println("Line Search Failed") #DEVNOTE# Include more info
+                warn("Line Search Failed") #DEVNOTE# Include more info
             end
 
 
@@ -239,7 +240,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 
             end
 
-            println("fin UpdateX")
+            (options.verbosity > 1) && println("fin UpdateX")
 
             gOld = copy(init.g) 
 
@@ -259,7 +260,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 gStep = min(options.stepMax,max(options.stepMin, sts/sty))
             end
 
-            println("fin CompScaling")
+            (options.verbosity > 1) && println("fin CompScaling")
 
 
         catch exc
@@ -282,14 +283,12 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         # Dont update if superoptimal 
         if init.singleTau | (init.f > init.sigma)
             init.lastFv[mod(init.iter, options.nPrevVals)+1] = init.f
-            println("lastFV: $(init.lastFv)")
+            if init.fBest > init.f
+                fBest = copy(init.f)
+                xBest = copy(init.x)
+            end
         end
-
-
-
-
-
-        break #DEVNOTE# Remove this when done main loop
+        
     end #Main Loop
 
 end

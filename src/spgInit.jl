@@ -42,4 +42,6 @@ type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
     funForward::Function
     nLineTot::Int64
     nProdAt::AbstractArray
+    fBest::ETxg
+    xBest::Txg
 end

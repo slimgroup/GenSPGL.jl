@@ -10,8 +10,6 @@ Use: x,itn = NormL1_project(x,weights,tau)
 """
 function NormL1_project{ETx<:Number,Tx<:AbstractVector{ETx}}(x::Tx, tau::Number,
                                                 weights, params)::Tuple{Tx,Int64}
-
-    println("Script made it into NORML1_project for real x")
     
     x_out,itn = oneprojector(x, weights, tau)
     
@@ -26,8 +24,6 @@ For Complex
 function NormL1_project{ETx<:Complex,Tx<:AbstractVector{ETx}}(x::Tx, tau::Number, 
                                                 weights, params)::Tuple{Tx,Int64}
 
-    println("Script made it into NORML1_project for complex x")
-    
     xa = abs(x)
     idx = find(xa .< eps())
     xc,itn = oneprojector(xa, weights, tau)

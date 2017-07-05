@@ -39,7 +39,6 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
 
     # This function is type stable except for 2 temp variables.
     # They shouldnt be a performance issue 
-    println("Script made it into oneprojector") 
     
     len_d = length(d)
     len_b = length(b)
@@ -92,7 +91,6 @@ oneprojectormex_I clone
 """
 function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::AbstractFloat)
 
-    println("Script made it into oneprojectormex for scalar weight")
     
     tau = tau/abs(d)
     len_b = length(b)
@@ -143,7 +141,6 @@ Use: x,itn = oneprojectormex(b::Abstractvector, d::AbstractVector, tau::Number)
 """
 function oneprojectormex{Tb<:Number,Td<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Td}, tau::Number)
     
-    println("Made it into oneprojectormex for vector d")
 
     #Get type of b.*d
     Tdb = promote_rule(Td,Tb)

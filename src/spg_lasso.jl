@@ -37,8 +37,6 @@ SPG_LASSO  Solve the LASSO problem\n
 """
 function spg_lasso(A ,b; tau::AbstractFloat=NaN ,options::spgOptions=spgOptions())
     
-    println("Script made it to spg_lasso")
-
     spgl1(A, b, tau = tau, options = options)
 
 end

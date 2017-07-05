@@ -97,7 +97,7 @@ julia> opts = spgOptions(verbosity = 0, iterations = 20000)
 Arguments:\n
     |___Field____||__Type__||_____________________Description____________________________|\n
     fid          |Integer|   ..... File ID for output\n
-    verbosity    |Integer|   ..... Verbosity level, 0 = Silent, 1 = Loud\n
+    verbosity    |Integer|   ..... Verbosity level, 0 = Silent, 1 = Loud, 2 = Debug\n
     iterations   |Integer|   ..... Max number of iterations\n
     nPrevVals    |Integer|   ..... Number previous func values for linesearch\n
     bpTol        |Number|    ..... Tolerance for basis pursuit solution \n

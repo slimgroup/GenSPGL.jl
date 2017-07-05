@@ -21,7 +21,8 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
 
     #DEVNOTE# Could make Tau and Sigma nullable types? However, as long as
     # Tau and Sigma are always Float64 this wont be a problem
-    println("Script made it to spgl1")
+    (options.verbosity > 1) && println("Script made it to spgl1")
+
 
     tic()
     m = length(b)
@@ -156,20 +157,20 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     singleTau && (logheader_2 = """
     Target reg. Norm of x   :$(tau)\n
 
-    Iter    Objective   Relative_Error  gNorm   stepG   nnzX    nnzG
-    --------------------------------------------------------------------------------\n
+    Iter    Objective      Relative_Error  gNorm         stepG     nnzX       nnzG
+    --------------------------------------------------------------------------------
     """)
 
     singleTau || (logheader_2 = """
     Target Objective        :$(sigma)\n
 
     Iter    Objective   Relative_Error  Rel_Error   gNorm   stepG   nnzX    nnzG    tau
-    -----------------------------------------------------------------------------------\n
+    -----------------------------------------------------------------------------------
     """)
     logheader = logheader_1*logheader_2
     
     # Decide what to do with log header based on verbosity setting
-    (options.verbosity == 1) && println(logheader)
+    (options.verbosity > 0) && println(logheader)
     
 
 
@@ -205,7 +206,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     xBest = copy(x)
     fOld = copy(f)
 
-    println("Init Finished")
+    (options.verbosity > 1) && println("Init Finished")
 
     # Wrap up initialized variables
     init = spgInit(A,
@@ -239,7 +240,9 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     gStep,
                     funForward,
                     nLineTot,
-                    nProdAt)
+                    nProdAt,
+                    fBest,
+                    xBest)
                     
     # Wrap main loop in a function to ease type stability
     spglcore(init)
@@ -256,13 +259,13 @@ Use:    x = project(x::AbstractArray, tau::Number, timeProject::Float64
 function project{ETx<:Number, Tx<:AbstractVector{ETx}}(x::Tx, tau::Number, timeProject::Float64,
                     options::spgOptions, params::Dict)
     
-    (options.verbosity == 1) && println("Begin Project")
+    (options.verbosity > 1) && println("Begin Project")
 
     x_out::Tx, itn::Int64 = options.project(x, tau, options.weights, params) 
  
     #DEVNOTE# Replace with @elapsed at call #timeProject[1] += (toc() - tStart)
 
-    (options.verbosity == 1) && println("Finish Project")
+    (options.verbosity > 1) && println("Finish Project")
     
     return x_out, itn
 
