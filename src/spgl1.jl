@@ -223,6 +223,7 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     options,
                     params,
                     timeProject,
+                    timeMatProd,
                     exit_status,
                     singleTau,
                     bNorm,
@@ -241,13 +242,36 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     funForward,
                     nLineTot,
                     nProdAt,
+                    nProdA,
                     fBest,
                     xBest)
                     
     # Wrap main loop in a function to ease type stability
-    spglcore(init)
+    init, rNorm, gNorm, rErr  = spglcore(init)
 
-    return init
+    # Prepare output
+    info = spgInfo(  init.tau,
+                    rNorm,
+                    gNorm,
+                    rErr,
+                    init.exit_status,
+                    init.iter,
+                    init.nProdA,
+                    init.nProdAt,
+                    init.nNewton,
+                    init.timeProject,
+                    init.timeMatProd,
+                    init.options,
+                    init.xNorm1,
+                    init.rNorm2,
+                    init.lambda)
+
+    if (options.verbosity > 0) 
+        println("--------------------------------------------------------------------------------\n")
+        print(info.exit_status)
+    end
+    
+    return init.x, init.r, init.g, info
 end #func
 
 

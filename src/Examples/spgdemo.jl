@@ -20,6 +20,6 @@ sigma = []
 x0=[]
 opts = spgOptions(verbosity = 1)
 
-spg_lasso(A,vec(b); tau = tau, options = opts)
+out = spg_lasso(A,vec(b); tau = tau, options = opts)
 
 end

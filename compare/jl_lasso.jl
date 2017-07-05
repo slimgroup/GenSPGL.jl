@@ -9,4 +9,4 @@ tau = vars["tau"]
 using GenSPGL
 opts = spgOptions(verbosity = 1)
 
-spg_lasso(A,b; tau = tau, options = opts)
+x, r, g, info = spg_lasso(A,b; tau = tau, options = opts)

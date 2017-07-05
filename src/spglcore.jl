@@ -15,6 +15,9 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
     # Pull out options type for easier use
     options = init.options
     params = init.params
+    
+    # Initialise rErr
+    rErr = zero(ETxg)
 
     #Main Loop
     while true
@@ -31,7 +34,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         end
         
         # rNorm and f are the same thing
-        rNorm = init.f
+        rNorm = copy(init.f)
 
         tmp_proj::Txg,tmp_itn::Int64 = project(init.x - init.g,
                                         init.tau, init.timeProject, options, params)
@@ -130,7 +133,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
             if init.singleTau
                 
-                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr rNorm log10(init.stepG) nnzX nnzG
+                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr gNorm log10(init.stepG) nnzX nnzG
                 (options.verbosity > 0) && println(s)
 
                 if init.subspace
@@ -139,7 +142,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             else
                 
                 #DEVNOTE# Check ML ver. This line should be different
-                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr rNorm log10(init.stepG) nnzX nnzG
+                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr gNorm log10(init.stepG) nnzX nnzG
                 (options.verbosity > 0) && println(s)
 
                 if init.printTau | init.subspace
@@ -161,6 +164,8 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         init.rNorm2[init.iter+1] = copy(rNorm)
         init.lambda[init.iter+1] = copy(gNorm)
         
+        # Act on exit conditions
+        ~(isnull(init.exit_status.triggered)) && break
         # ================================================================================
         # Begin Iterations
         # ================================================================================
@@ -284,14 +289,39 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         if init.singleTau | (init.f > init.sigma)
             init.lastFv[mod(init.iter, options.nPrevVals)+1] = init.f
             if init.fBest > init.f
-                fBest = copy(init.f)
-                xBest = copy(init.x)
+                init.fBest = copy(init.f)
+                init.xBest = copy(init.x)
             end
         end
         
     end #Main Loop
-
+    
+    # Restore best solution(only if solving single problem)
+    if (init.singleTau) & (init.f >init.fBest)
+        if options.restore
+            rNorm = init.fBest
+            (options.verbosity > 1) && println("Restoring best iterate to objective: $(rNorm)")
+            init.x = init.xBest
+            init.r = init.b - init.funForward(init.A, init.x, [], params)
+            init.f, init. g, init.g2 = funCompositeR(init.A, init.x, init.r, init.funForward,
+                                            options.funPenalty, init.nProdAt, params)
+            if options.proxy
+                gNorm = options.dual_norm(init.g2, options.weights)
+            else
+                gNorm = options.dual_norm(init.g, options.weights)
+            end
+            rNorm = init.f
+        else
+            (options.verbosity > 0) && println("""
+                Note: Solution not actually optimal. Best objective value is $fBest
+                """)
+        end
+    end
+    
+    return init, rNorm, gNorm, rErr
 end
+
+
 
 """
 Use: nnzX,nnzG,nnzIdx,nnzDiff = activevars(x,g,nnzIdx,options, params)

@@ -24,6 +24,7 @@ type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
     options::spgOptions
     params::Dict{String,Number}
     timeProject::Float64
+    timeMatProd::Float64
     exit_status::spgExitCondition  
     singleTau::Bool
     bNorm::ETxg
@@ -42,6 +43,7 @@ type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
     funForward::Function
     nLineTot::Int64
     nProdAt::AbstractArray
+    nProdA::AbstractArray
     fBest::ETxg
     xBest::Txg
 end
