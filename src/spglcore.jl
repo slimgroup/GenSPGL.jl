@@ -143,11 +143,12 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             else
                 
                 #DEVNOTE# Check ML ver. This line should be different
-                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr gNorm log10(init.stepG) nnzX nnzG
-                (options.verbosity > 0) && println(s)
-
                 if init.printTau | init.subspace
-                    println("$(init.tau)")#   $itnLSQR\n")
+                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i %13.7e" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG init.tau
+                else
+                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG
+                    (options.verbosity > 0) && println(s)
+
                 end
             end
 
@@ -172,7 +173,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         # ================================================================================
         init.iter += 1
         xOld = copy(init.x)
-        fOld = copy(init.f)
+        init.fOld = copy(init.f)
         rOld = copy(init.r)
        
         try
@@ -182,7 +183,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
             (options.verbosity > 1) && println("begin LineSearch")
 
-            init.f, init.x, init.r, nLine, stepG, lnErr, localProdA = spglinecurvy(init.A,
+            init.f, init.x, init.r, nLine, init.stepG, lnErr, localProdA = spglinecurvy(init.A,
                                                                     init.x, 
                                                                     init.gStep*init.g,
                                                                     maximum(init.lastFv),
@@ -262,9 +263,9 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             sty = dot(xOld,y)
 
             if sty <= 0
-                gStep = options.stepMax
+                init.gStep = options.stepMax
             else
-                gStep = min(options.stepMax,max(options.stepMin, sts/sty))
+                init.gStep = min(options.stepMax,max(options.stepMin, sts/sty))
             end
 
             (options.verbosity > 1) && println("fin CompScaling")

@@ -153,20 +153,26 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
     Basis Pursuit tol       :$(options.bpTol)
     Maximum Iterations      :$(options.iterations)
     """
-    
-    singleTau && (logheader_2 = """
+   
+    println("singleTau: ", singleTau)
+
+    if singleTau 
+        (logheader_2 = """
     Target reg. Norm of x   :$(tau)\n
 
     Iter    Objective      Relative_Error  gNorm         stepG     nnzX       nnzG
     --------------------------------------------------------------------------------
     """)
 
-    singleTau || (logheader_2 = """
+    else 
+        (logheader_2 = """
     Target Objective        :$(sigma)\n
 
-    Iter    Objective   Relative_Error  Rel_Error   gNorm   stepG   nnzX    nnzG    tau
-    -----------------------------------------------------------------------------------
+    Iter   Objective      Relative_Error  RelError  gNorm         stepG    nnzX    nnzG    tau
+    -------------------------------------------------------------------------------------------
     """)
+    end
+    
     logheader = logheader_1*logheader_2
     
     # Decide what to do with log header based on verbosity setting
