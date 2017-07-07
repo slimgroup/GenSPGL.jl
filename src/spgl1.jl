@@ -32,7 +32,7 @@ export spgl1, project, SpotFunForward
             GenSPGL determines the legnth n via n = length(A'b) and sets x0 = zeros(n).\n
     options:
         - An instance of the composite tpe spgOptions. If not specified, default values
-            are used. See the spgOptions documents for default values.\n
+            are used. See the spgOptions documents for default values.
 
 # Outputs 
     x:

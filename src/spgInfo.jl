@@ -5,8 +5,8 @@ export spgInfo
 
 """
 GenSPGL output vars composite type. \n
-Passed to spgl1.jl from spglcore.jl
 
+Tip: Use print(ec::spgExitCondition) to display an exit status.
 """
 type spgInfo{ETxg<: AbstractFloat, Txg<:AbstractVector{ETxg}}
    
@@ -19,8 +19,8 @@ type spgInfo{ETxg<: AbstractFloat, Txg<:AbstractVector{ETxg}}
     nProdA::Int64
     nProdAt::Int64
     nNewton::Int64
-    timeProject::ETxg
-    timeMatProd::ETxg
+    timeProject::Float64
+    timeMatProd::Float64
     options::spgOptions
     xNorm1::Txg
     rNorm2::Txg
