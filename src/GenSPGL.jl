@@ -18,6 +18,7 @@ include("NormL1_dual.jl")
 include("NormL1_primal.jl")
 include("oneprojector.jl")
 include("spglinecurvy.jl")
+include("NLfunForward.jl")
 
 # Penalties
 #DEVNOTE# Obviously generalize these paths

@@ -5,7 +5,7 @@ function spgdemo()
 
 # Create random m-by-n encoding matric and sparse vector
 m = 50; n = 128; k = 14
-A,Rtmp = qr(randn(n,m))
+A,Rtmp = qr(complex(randn(n,m)))
 A = A'
 p = randperm(n)
 p = p[1:k]

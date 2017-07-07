@@ -11,4 +11,6 @@ toc;
 display('------------- Basis Pursuit --------------')
 
 opts = spgSetParms('verbosity',2);
+tic;
 x_bp = spg_bp(A, b, opts);
+toc

@@ -21,5 +21,6 @@ Basis Pursuit\n
 """)
 sigma = 0.
 tau = 0.
+
 x, r, g, info = spgl1(A, b; tau = tau, sigma = sigma, options = opts)
 

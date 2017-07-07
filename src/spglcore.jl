@@ -108,8 +108,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 init.tau = max(zero(typeof(init.tau)), init.tau + (aError1)/ gNorm)::typeof(tauOld)
                 init.nNewton += one(typeof(init.nNewton))
                 
-                #DEVNOTE# Unstable, but may remove later
-                init.printTau = (abs(tauOld - init.tau) >= 1e-6 * init.tau)::Bool 
+                init.printTau = (abs(tauOld - init.tau) >= (1e-6 * init.tau)) 
 
                 if init.tau < tauOld
                     init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
@@ -144,12 +143,11 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 
                 #DEVNOTE# Check ML ver. This line should be different
                 if init.printTau | init.subspace
-                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i %13.7e" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG init.tau
+                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i  %13.7e" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG init.tau
                 else
                     s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG
-                    (options.verbosity > 0) && println(s)
-
                 end
+                    (options.verbosity > 0) && println(s)
             end
 
         end
@@ -350,8 +348,8 @@ function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x:
     end
 
     #Reduced costs for postive and negative parts of x
-    z1 = gNorm + g
-    z2 = gNorm - g
+    z1::Txg = gNorm + g
+    z2::Txg = gNorm - g
 
     #Primal/dual based indicators
     xPos = BitArray{1}()

@@ -168,8 +168,8 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
         (logheader_2 = """
     Target Objective        :$(sigma)\n
 
-    Iter   Objective      Relative_Error  RelError  gNorm         stepG    nnzX    nnzG    tau
-    -------------------------------------------------------------------------------------------
+    Iter   Objective      Relative_Error  RelError  gNorm         stepG    nnzX    nnzG  tau
+    -----------------------------------------------------------------------------------------------
     """)
     end
     
@@ -273,7 +273,8 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     init.lambda)
 
     if (options.verbosity > 0) 
-        println("--------------------------------------------------------------------------------\n")
+        println("-------------------------------------------------------------------------
+                -----------\n")
         print(info.exit_status)
     end
     
