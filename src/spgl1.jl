@@ -3,11 +3,56 @@
 export spgl1, project, SpotFunForward
 
 """
-This will contain info on use of spgl1
+# INFO 
+    Use:
+        x, r, g, info = spgl1(A::AbstractArray, b::AbstractVector{Tb};
+                            x::AbstractVector{Tx}=Array{Tb,1}(),
+                            tau::AbstractFloat=NaN,
+                            sigma::AbstractFloat=NaN,
+                            options::spgOptions = spgOptions(),
+                            params::Dict{String,Number} = Dict{String,Number}())\n
+        Solve regularized composite programs, including:
+            a) basis pursuit, basis pursuit denoise, and lasso
+            b) non-linear versions of above problems, where forward model is non-linear
 
-EXPLICIT METHOD
+# Inputs 
+    A:
+        - An explicit 'm' x 'n' matrix
+        - An implicit JOLI opperator (in development)
+        - A non-linear function handle (in development)\n
+    b:
+        - An m-vector\n
+    tau:
+        - A non-negative scalar\n
+    sigma:
+        - If sigma != NaN then GenSPGL will launch into a root-finding mode to find the 
+            tau above that solves. In this case it is STRONGLY recommended that tau = 0.\n
+    x0:
+        - An n-vector estimate of the solution (possibly all zeros). If empty, then
+            GenSPGL determines the legnth n via n = length(A'b) and sets x0 = zeros(n).\n
+    options:
+        - An instance of the composite tpe spgOptions. If not specified, default values
+            are used. See the spgOptions documents for default values.\n
 
-When implementing JOLI support, provide new method. e.g A::joOp....
+# Outputs 
+    x:
+        - A solution of the problem\n
+    r: 
+        - The residual, r = b - f(x)\n
+    g:
+        - The gradient, g = \u2207h(b - f(x))\n
+    info:
+        - An instance of the spgInfo composite type. See the spgInfo documents for
+            more information.
+# Author
+    Keegan Lensink
+        Seismic Laboratory for Imaging and Modeling
+        The University of British Columbia
+        keeganlensink@gmail.com
+
+    This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, 
+    and Aleksandr Aravkin's MATLAB program SPGL1. 
+
 """
 function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVector{Tb};
                     x::AbstractVector{Tx}=Array{Tb,1}(),

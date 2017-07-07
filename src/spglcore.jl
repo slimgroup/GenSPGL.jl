@@ -1,9 +1,29 @@
 export spglcore
 
 """
-Use: spglcore()
+# Info
+    Use:
+        spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init::spgInit{ETxg, Txg, Tidx})
+# Input
+    init:
+        - An instance of the composite type spgInit which contains all initalized variables
+            created in the preceding call to spgl1.\n
 
-Main loop of spgl1.jl
+# Outputs
+    init: 
+        - An instance of the composite type spgInit that contains all updates to variables
+            initialized in the preceding call to spgl1\n
+    rNorm:
+        - Value of the objective\n
+
+# Author
+    Keegan Lensink
+        Seismic Laboratory for Imaging and Modeling
+        The University of British Columbia
+        keeganlensink@gmail.com
+ 
+    This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, 
+    and Aleksandr Aravkin's MATLAB program SPGL1. 
 """
 function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init::spgInit{ETxg, Txg, Tidx})
 
