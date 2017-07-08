@@ -298,8 +298,8 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     xBest)
                     
     # Wrap main loop in a function to ease type stability
+    #@code_warntype spglcore(init)
     init, rNorm, gNorm, rErr  = spglcore(init)
-
     # Prepare output
     info = spgInfo(  init.tau,
                     rNorm,

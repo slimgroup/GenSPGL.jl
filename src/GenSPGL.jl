@@ -3,6 +3,9 @@ Julia port of MPF's SPGL1
 """
 module GenSPGL
 
+# Modules
+using MAT
+
 # Types
 include("spgOptions.jl")
 include("spgExitCondition.jl")
@@ -26,5 +29,5 @@ include("Penalty/funLS.jl")
 
 # Examples
 include("Examples/spgdemo.jl")
-
+include("../compare/jl_lasso.jl")
 end # module

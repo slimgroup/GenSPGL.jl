@@ -6,7 +6,7 @@ load('vars_lasso.mat')
 
 tic;
 x_lasso = spg_lasso(A, b, tau);
-toc;
+toc
 
 display('------------- Basis Pursuit --------------')
 
@@ -17,4 +17,6 @@ toc
 
 % Set up vector b, and run solver
 sigma = 0.10;       % Desired ||Ax - b||_2
+tic;
 x_bpdn = spg_bpdn(A, b_noise, sigma, opts);
+toc

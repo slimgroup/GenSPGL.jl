@@ -68,9 +68,12 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
         # Count number of consecutive iterations with identical support
         
-        nnzOld::Tidx = deepcopy(init.nnzIdx) #DEVNOTE# Not stable, but shouldnt be a big deal
+        nnzOld::Tidx = deepcopy(init.nnzIdx)
+        
+        #DEVNOTE# This line is a major performance hit 
+        #@code_warntype activevars(init.x, init.g, init.nnzIdx, options, params)
         nnzX,nnzG,init.nnzIdx,nnzDiff = activevars(init.x, init.g, init.nnzIdx, options, params)
-      
+        
         if (nnzDiff == -1)
             init.nnzIter = 0
         end
@@ -82,7 +85,9 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         else
             init.nnzIter += 1
             (init.nnzIter >= options.activeSetIt) && (init.exit_status.triggered = 9)
-            nnzX = sum(abs.(init.x) .>= min(0.1,10*options.optTol))::Int64
+            tmp_nnzX1 = min(0.1,10*options.optTol)::Float64
+            tmp_nnzX2::BitArray{1} = (abs.(init.x) .>= tmp_nnzX1)
+            nnzX = sum(tmp_nnzX2)
         end
 
         # SingleTau, check if optimal
@@ -161,7 +166,6 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                 end
             else
                 
-                #DEVNOTE# Check ML ver. This line should be different
                 if init.printTau | init.subspace
                     s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i  %13.7e" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG init.tau
                 else
@@ -368,16 +372,23 @@ function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x:
     end
 
     #Reduced costs for postive and negative parts of x
-    z1::Txg = gNorm + g
-    z2::Txg = gNorm - g
+    z1 = gNorm .+ g
+    z2 = gNorm .- g
 
     #Primal/dual based indicators
     xPos = BitArray{1}()
     xNeg = BitArray{1}()
 
     if(~options.proxy)
-        xPos = (x .>  xTol) .& (z1 .< gTol)
-        xNeg = (x .< -xTol) .& (z2 .< gTol)
+        # Unwrap temp vars for performance
+        a = x .> xTol
+        b = z1 .< gTol
+        xPos = a .& b
+        
+        c = x .< -xTol
+        d = z2 .< gTol
+        xNeg = c .& d
+        
         nnzIdx = xPos .| xNeg
     end
 
@@ -389,7 +400,8 @@ function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x:
                 # Need to document what this means though
         nnzDiff = -one(Int64)
     else
-        nnzDiff = sum(nnzIdx .!== nnzOld_inner)::Int64
+        e = nnzIdx .!== nnzOld_inner
+        nnzDiff = sum(e)::Int64
     end
 
     return nnzX, nnzG, nnzIdx, nnzDiff
