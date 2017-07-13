@@ -25,7 +25,9 @@ export spglcore
     This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, 
     and Aleksandr Aravkin's MATLAB program SPGL1. 
 """
-function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init::spgInit{ETxg, Txg, Tidx})
+function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
+                    ETg<:Number, ETr<:Number, Tidx<:BitArray}(init::spgInit{TA,
+                    ETb, ETx, ETg, ETr, Tidx})
 
     #DEVNOTE# Create spgInit type to hold all these initialized paramaters
     
@@ -37,7 +39,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
     params = init.params
     
     # Initialise rErr
-    rErr = zero(ETxg)
+    rErr = zero(ETr)
 
     #Main Loop
     while true
@@ -45,7 +47,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         # ================================================================================
         # Test Exit Conditions
         # ================================================================================ 
-        gNorm::ETxg = zero(ETxg)
+        gNorm = zero(ETg)
 
         if (options.proxy)
             gNorm = options.dual_norm(init.g2, options.weights, init.params)
@@ -56,10 +58,10 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
         # rNorm and f are the same thing
         rNorm = copy(init.f)
 
-        tmp_proj::Txg,tmp_itn::Int64 = project(init.x - init.g,
+        tmp_proj, tmp_itn = project(init.x - init.g,
                                         init.tau, init.timeProject, options, params)
-        Err::ETxg = norm(init.x - tmp_proj)
-        rErr::ETxg = Err/max(1,init.f)
+        Err = norm(init.x - tmp_proj)
+        rErr = Err/max(1,init.f)
    
         aError1 = rNorm - init.sigma
         aError2 = rNorm^2 - init.sigma^2
@@ -68,12 +70,17 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
         # Count number of consecutive iterations with identical support
         
-        nnzOld::Tidx = deepcopy(init.nnzIdx)
+        nnzOld = deepcopy(init.nnzIdx)
         
         #DEVNOTE# This line is a major performance hit 
-        #@code_warntype activevars(init.x, init.g, init.nnzIdx, options, params)
-        nnzX,nnzG,init.nnzIdx,nnzDiff = activevars(init.x, init.g, init.nnzIdx, options, params)
-        
+        if ~(options.proxy) 
+
+            #@code_warntype activevars(init.x, init.g, init.nnzIdx, options, params)
+            nnzX,nnzG,init.nnzIdx,nnzDiff = activevars(init.x, init.g, init.nnzIdx, options, params)
+        else
+            nnzX,nnzG,init.nnzIdx,nnzDiff = activevars(init.x, init.g2, init.nnzIdx, options, params)
+        end
+
         if (nnzDiff == -1)
             init.nnzIter = 0
         end
@@ -143,7 +150,7 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
 
         end
 
-        if (isnull(init.exit_status.triggered) & init.iter >= options.iterations)
+        if (isnull(init.exit_status.triggered) & ((init.iter+1) >= options.iterations))
             init.exit_status.triggered = 5 
         end
 
@@ -229,7 +236,6 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             if (lnErr !== 0)
                 #DEVNOTE# Finish this if statement
                 println("Line Error: $(lnErr)")
-                throw(error("SPGLine Error in development"))
 
                 (options.verbosity > 1) && println("begin FeasLineSearch")
 
@@ -244,13 +250,57 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
                     throw(error("Empty X")) # This should never be invoked 
                 end
 
-                gtd = dot(g,dx)
+                gtd = dot(init.g,dx)
+                
+                if options.linear
+                    init.f, step, init.r, nLine, localProdA = spgline(init.A,
+                                                                init.f,
+                                                                dx,
+                                                                gtd,
+                                                                rOld,
+                                                                maximum(init.lastFv),
+                                                                init.funForward,
+                                                                options.funPenalty,
+                                                                params,
+                                                                init.b,
+                                                                options.feasSrchIt,
+                                                                options.linear,
+                                                                options,
+                                                                init.timeProject)
+                else
+                    init.f, step, init.r, nLine, localProdA = spgline(init.A,
+                                                                init.f,
+                                                                dx,
+                                                                gtd,
+                                                                init.x,
+                                                                maximum(init.lastFv),
+                                                                init.funForward,
+                                                                options.funPenalty,
+                                                                params,
+                                                                init.b,
+                                                                options.feasSrchIt,
+                                                                options.linear,
+                                                                options,
+                                                                init.timeProject)
+                end
+
+                init.nProdA += localProdA
+                
+                (options.verbosity > 1) && println("Fin FeasLineSearch")
+
+                if isempty(xOld)
+                    init.x = step*dx
+                else
+                    init.x = xOld + step*dx
+                end
+
+                init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
             end
             
             # Failed again, Revert to Previous iterates and damp max BB step
             if (lnErr !== 0)
                 options.stepMax /= 10
-                warn("Line Search Failed") #DEVNOTE# Include more info
+                warn("Line Search Failed. Line Error: $(lnErr)") #DEVNOTE# Include more info
             end
 
 
@@ -273,7 +323,6 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             (options.verbosity > 1) && println("fin UpdateX")
 
             gOld = copy(init.g) 
-
             init.f, init.g, init.g2 = funCompositeR(init.A, init.x, init.r, init.funForward,
             options.funPenalty, init.nProdAt, params)
 
@@ -284,14 +333,15 @@ function spglcore{ETxg<:Number, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}(init:
             sts = dot(xOld,xOld)
             sty = dot(xOld,y)
 
-            if sty <= 0
+
+            #DEVNOTE# Double check that it is okay to only compare the real part of sty
+            if real(sty) <= 0
                 init.gStep = options.stepMax
             else
-                init.gStep = min(options.stepMax,max(options.stepMin, sts/sty))
+                init.gStep = min(options.stepMax,max(options.stepMin, real(sts/sty)))
             end
 
             (options.verbosity > 1) && println("fin CompScaling")
-
 
         catch exc
             
@@ -358,12 +408,12 @@ nnzIdx  is a vector of primal/dual indicators.
 nnzDiff is the no. of elements that changed in the support.
 """
 function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x::Txg,g::Txg,
-                        nnzIdx::Ti, options::spgOptions,params::Dict{String,Number})
+                        nnzIdx::Ti, options::spgOptions,params::Dict{String,Any})
 
-    xTol::ETxg = min(.1,10*options.optTol)
-    gTol::ETxg = min(.1,10*options.optTol)
+    xTol = min(.1,10*options.optTol)
+    gTol = min(.1,10*options.optTol)
 
-    gNorm::ETxg = options.dual_norm(g,options.weights, params)
+    gNorm = options.dual_norm(g,options.weights, params)
     
     if isnull(nnzIdx)
         nnzOld_inner = Ti()
@@ -391,7 +441,7 @@ function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x:
         
         nnzIdx = xPos .| xNeg
     end
-
+    
     nnzX = sum(abs.(x) .>= xTol)::Int64
     nnzG = sum(nnzIdx)::Int64
 

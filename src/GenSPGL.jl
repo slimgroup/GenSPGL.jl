@@ -20,8 +20,13 @@ include("NormL1_project.jl")
 include("NormL1_dual.jl")
 include("NormL1_primal.jl")
 include("oneprojector.jl")
+include("spgline.jl")
 include("spglinecurvy.jl")
 include("NLfunForward.jl")
+include("TraceNorm_project.jl")
+include("TraceNorm_dual.jl")
+include("TraceNorm_primal.jl")
+include("afun.jl")
 
 # Penalties
 #DEVNOTE# Obviously generalize these paths

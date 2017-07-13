@@ -4,15 +4,21 @@ export NLfunForward
 
 """
 """
-function NLfunForward(x, g, params)
+function NLfunForward(A, x, g, params)
+    
+    e = params["numr"]*params["nr"]
+    L = x[1:e]
+    R = x[(e+1):end]
+    L = reshape(L, params["numr"], params["nr"])
+    R = reshape(R, params["numc"], params["nr"])
 
     if isempty(g)
-        f1 = params["A"]*x
-        f2 = 0
+        f1 = params["afun"](L*R', params)
+        f2 = 0.
     else
-        f1 = params["A"]'*g
-        f2 = g
-
+        fp = params["afunT"](g)
+        f1 = [vec(fp*R); vec(fp'*L)]
+        f2 = vec(fp)
     end
 
     return f1,f2

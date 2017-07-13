@@ -5,12 +5,12 @@ export spgl1, project, SpotFunForward
 """
 # INFO 
     Use:
-        x, r, g, info = spgl1(A::AbstractArray, b::AbstractVector{Tb};
-                            x::AbstractVector{Tx}=Array{Tb,1}(),
+        x, r, g, info = spgl1(A::AbstractArray, b::AbstractVector{ETb};
+                            x::AbstractVector{ETx}=Array{ETb,1}(),
                             tau::AbstractFloat=NaN,
                             sigma::AbstractFloat=NaN,
                             options::spgOptions = spgOptions(),
-                            params::Dict{String,Number} = Dict{String,Number}())\n
+                            params::Dict{String,Any} = Dict{String,Any}())\n
         Solve regularized composite programs, including:
             a) basis pursuit, basis pursuit denoise, and lasso
             b) non-linear versions of above problems, where forward model is non-linear
@@ -54,19 +54,19 @@ export spgl1, project, SpotFunForward
     and Aleksandr Aravkin's MATLAB program SPGL1. 
 
 """
-function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVector{Tb};
-                    x::AbstractVector{Tx}=Array{Tb,1}(),
+function spgl1{ETx<:Number, ETb<:Number}(A::AbstractArray, b::AbstractVector{ETb};
+                    x::AbstractVector{ETx}=Array{ETb,1}(),
                     tau::AbstractFloat=NaN,
                     sigma::AbstractFloat=NaN,
                     options::spgOptions = spgOptions(),
-                    params::Dict{String,Number} = Dict{String,Number}())
+                    params::Dict{String,Any} = Dict{String,Any}())
     
     REVISION = "0.1"
     DATE = "June, 2017"
 
     #DEVNOTE# Could make Tau and Sigma nullable types? However, as long as
     # Tau and Sigma are always Float64 this wont be a problem
-    (options.verbosity > 1) && println("Script made it to spgl1")
+    (options.verbosity > 1) && println("Script made it to spgl1 for A::AbstractArray")
 
 
     tic()
@@ -298,8 +298,8 @@ function spgl1{Tx<:AbstractFloat, Tb<:Number}(A::AbstractArray, b::AbstractVecto
                     xBest)
                     
     # Wrap main loop in a function to ease type stability
-    #@code_warntype spglcore(init)
     init, rNorm, gNorm, rErr  = spglcore(init)
+
     # Prepare output
     info = spgInfo(  init.tau,
                     rNorm,
@@ -357,14 +357,14 @@ Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
 function funCompositeR(A::AbstractArray,x::AbstractArray,r::AbstractArray,
                         funForward::Function, funPenalty::Function, 
                         nProdAt::Int64,
-                        params::Dict{String,Number})
+                        params::Dict{String,Any})
 
     nProdAt += one(Int64)
     f,v = funPenalty(r, params)
     
     if ~(params["proxy"])
         g1 = funForward(A, x, -v, params)
-        g2 = zero(eltype(g1))
+        g2 = [zero(eltype(g1))]
     else
         g1,g2 = funForward(A, x, -v, params)
     end
@@ -386,3 +386,305 @@ function SpotFunForward(A::AbstractArray, x::AbstractArray, g::AbstractArray, pa
     return f
 
 end
+
+"""
+    Use:
+        x, r, g, info = spgl1(A::Function, b::AbstractVector{ETb};
+                            x::AbstractVector{ETx}=Array{ETb,1}(),
+                            tau::AbstractFloat=NaN,
+                            sigma::AbstractFloat=NaN,
+                            options::spgOptions = spgOptions(),
+                            params::Dict{String,Any} = Dict{String,Any}())\n
+"""
+function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
+                    x::AbstractVector{ETx}=Array{Tb,1}(),
+                    tau::AbstractFloat=NaN,
+                    sigma::AbstractFloat=NaN,
+                    options::spgOptions = spgOptions(),
+                    params::Dict{String,Any} = Dict{String,Any}())
+    
+    REVISION = "0.1"
+    DATE = "June, 2017"
+
+    #DEVNOTE# Could make Tau and Sigma nullable types? However, as long as
+    # Tau and Sigma are always Float64 this wont be a problem
+    (options.verbosity > 1) && println("Script made it to spgl1 for A::Function")
+
+
+    tic()
+    m = length(b)
+
+    #Add options proxy to params dict
+    params["proxy"] = options.proxy
+
+    # Check Tau and Sigma
+    if isnan(tau) & isnan(sigma)
+        tau = 0.
+        sigma = 0.
+        singleTau = false
+    elseif isnan(sigma)
+        singleTau = true
+    else
+        if isnan(tau)
+            tau = 0.
+        end
+        singleTau = false
+    end
+
+    # Definitely dont do subspacemin in the non LS case
+    #DEVNOTE# Make sure name matches once funLS is written
+    string(options.funPenalty)=="GenSPGL.funLS" || (options.subspaceMin = 0) 
+    
+    # Threshold for signifigant Newton step
+    pivTol = 1e-12
+
+
+
+    ##--------------------------------------------------------------------------------
+    # Initialize Local Variables
+    ##--------------------------------------------------------------------------------  
+    iter = 0; itnTotLSQR = 0#Total SPGL1 and LSQR iterations.
+    nProdA = 0; nProdAt = 0
+    lastFv = [-Inf for i=1:options.nPrevVals] # Last m functions values
+    nLineTot = 0            # Total number of linesearch steps
+    printTau = false
+    nNewton = 0;
+    bNorm, b_normalized = options.funPenalty(b, params)
+    stat = false
+    timeProject = zero(Float64)
+    timeMatProd = zero(Float64)
+    nnzIter = zero(Int64) # No. of Its with fixed pattern
+    nnzIdx = BitArray{1}()  # Active set indicator
+    subspace = false        # Flag if did subspace min in current itn
+    stepG = 1.0               # Step length for projected gradient
+    testUpdateTau = false
+
+    ##-------------------------------------------------------------------------------
+    # End Init
+    ##-------------------------------------------------------------------------------
+
+    #DEVNOTE# This could be a splitting point for multiple dispatch
+
+    # Determine Initial x, vector length n, and check if complex
+    # Explicit Method
+    #DEVNOTE# Change name to JOLI  once things are working
+    funForward = A
+
+    if isempty(x)
+        x_tmp = funForward(A, x, -b) #DEVNOTE# Check to make sure this is tmp
+        n = length(x_tmp)
+        realx = isreal(x_tmp) & isreal(b)
+
+        x = zeros(n)
+    else
+        n = length(x)
+        realx = isreal(x) & isreal(b)
+    end
+
+    (eltype(A)<:Number) && (realx = realx & isreal(A))
+
+    # Override if complex flag was used
+    isnull(options.iscomplex) || (realx = ~get(options.iscomplex))
+
+
+    
+    # Check if all weights (if any) are strictly positive. In previous
+    # versions we also checked if the number of weights was equal to
+    # n. In the case of multiple measurement vectors, this no longer
+    # needs to apply, so the check was removed.
+    any(isinf.(options.weights)) && error("Weights must be finite")
+    any(options.weights .> 0) || error("Weights must be strictly positive")
+    
+    # Quick exit if sigma >= ||b||. Set Tau = 0 to short circuit the loop
+    if bNorm <= sigma
+        println("W: sigma >= ||b||.  Exact solution is x = 0.")
+        tau = 0
+        singleTau = true
+    end
+
+    # Don't do subspaceMin if x is complex
+    if (~realx & options.subspaceMin)
+        println("W: Subspace minimization disabled when variables are complex")
+        subspaceMin = false
+    end
+
+
+    #DEVNOTE# Once these are being updated check to see if type should be inferred
+            # from promotion rules
+    # Pre-Allocate iteration info vectors
+    xNorm1 = zeros(Float64, min(options.iterations,10000))
+    rNorm2 = zeros(Float64, min(options.iterations,10000))
+    lambda = zeros(Float64, min(options.iterations,10000))
+
+    # Create ExitCondition with null trigger
+    exit_status = spgExitCondition()
+
+    #Prepare Log Header
+    logheader_1 = """
+    ================================================================================  
+    GenSPGL.jl, Rev $(REVISION), $(DATE)
+    ================================================================================\n
+
+    No. Rows                :$(m)               
+    No. Columns             :$(n)
+    Initial Tau             :$(tau)             
+    Penalty                 :$(options.funPenalty)
+    Regularizer             :$(options.primal_norm)
+    Penalty(b)              :$(bNorm)
+    Optimality tol          :$(options.optTol)
+    Basis Pursuit tol       :$(options.bpTol)
+    Maximum Iterations      :$(options.iterations)
+    """
+   
+    println("singleTau: ", singleTau)
+
+    if singleTau 
+        (logheader_2 = """
+    Target reg. Norm of x   :$(tau)\n
+
+    Iter    Objective      Relative_Error  gNorm         stepG     nnzX       nnzG
+    --------------------------------------------------------------------------------
+    """)
+
+    else 
+        (logheader_2 = """
+    Target Objective        :$(sigma)\n
+
+    Iter   Objective      Relative_Error  RelError  gNorm         stepG    nnzX    nnzG  tau
+    -----------------------------------------------------------------------------------------------
+    """)
+    end
+    
+    logheader = logheader_1*logheader_2
+    
+    # Decide what to do with log header based on verbosity setting
+    (options.verbosity > 0) && println(logheader)
+    
+
+
+    # Project the stating point and evaluate function and gradient
+    r = typeof(b)() 
+   
+    
+    if isempty(x)#DEVNOTE# matlab Legacy, this can never be invoked. see 90-99
+        
+        #DEVNOTE# Why copy? Waste of mem and time. Check if b is used again
+        r = deepcopy(b) 
+        f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
+    else
+        x,itn = project(x,tau, timeProject, options, params)
+        r = b - funForward(A, x, [], params)[1]
+        nProdA += 1
+        f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
+        dx_tmp, itn_tmp = project(x-g, tau, timeProject, options, params)
+        dx = dx_tmp - x
+        itn += itn_tmp
+    end
+       
+    dxNorm = norm(dx,Inf)
+    if dxNorm < (1/options.stepMax)
+        gStep = options.stepMax
+    else
+        gStep = min(options.stepMax, max(options.stepMin, 1/dxNorm))
+    end
+
+    # Required for non-monotone strategy
+    lastFv[1] = copy(f)
+    fBest = copy(f)
+    xBest = copy(x)
+    fOld = copy(f)
+
+    (options.verbosity > 1) && println("Init Finished")
+
+    # Wrap up initialized variables
+    init = spgInit(A,
+                    b,
+                    x,
+                    tau,
+                    sigma,
+                    g,
+                    g2,
+                    f,
+                    r,
+                    nnzIdx,
+                    nnzIter,
+                    options,
+                    params,
+                    timeProject,
+                    timeMatProd,
+                    exit_status,
+                    singleTau,
+                    bNorm,
+                    fOld,
+                    testUpdateTau,
+                    iter,
+                    nNewton,
+                    printTau,
+                    subspace,
+                    stepG,
+                    xNorm1,
+                    rNorm2,
+                    lambda,
+                    lastFv,
+                    gStep,
+                    funForward,
+                    nLineTot,
+                    nProdAt,
+                    nProdA,
+                    fBest,
+                    xBest)
+                    
+    # Wrap main loop in a function to ease type stability
+    #@code_warntype spglcore(init)
+    init, rNorm, gNorm, rErr  = spglcore(init)
+    # Prepare output
+    info = spgInfo(  init.tau,
+                    rNorm,
+                    gNorm,
+                    rErr,
+                    init.exit_status,
+                    init.iter,
+                    init.nProdA,
+                    init.nProdAt,
+                    init.nNewton,
+                    init.timeProject,
+                    init.timeMatProd,
+                    init.options,
+                    init.xNorm1,
+                    init.rNorm2,
+                    init.lambda)
+
+    if (options.verbosity > 0) 
+        println("-------------------------------------------------------------------------
+                -----------\n")
+        print(info.exit_status)
+    end
+    
+    return init.x, init.r, init.g, info
+end #func
+
+"""
+GenSPGL
+
+Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
+"""
+function funCompositeR(A::Function,x::AbstractArray,r::AbstractArray,
+                        funForward::Function, funPenalty::Function, 
+                        nProdAt::Int64,
+                        params::Dict{String,Any})
+
+    nProdAt += one(Int64)
+    f,v = funPenalty(r, params)
+    
+    if ~(params["proxy"])
+        g1 = funForward(A, x, -v, params)
+        g2 = zero(eltype(g1))
+    else
+        g1,g2 = funForward(A, x, -v, params)
+    end
+
+    return f,g1,g2
+end
+
+
+

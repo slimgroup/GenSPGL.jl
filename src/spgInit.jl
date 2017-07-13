@@ -8,42 +8,47 @@ GenSPGL Initialized local vars composite type. \n
 Passed to spglcore.jl
 
 """
-type spgInit{ETxg<:Float64, Txg<:AbstractVector{ETxg}, Tidx<:BitArray}
+type spgInit{TA<:Union{AbstractArray, Function},ETb<:Number,
+                                                ETx<:Number,
+                                                ETg<:Number,
+                                                ETr<:Number,
+                                                Tidx<:BitArray}
     
-    A::AbstractArray
-    b::AbstractVector
-    x::Txg
-    tau::ETxg
-    sigma::ETxg
-    g::Txg
-    g2::ETxg
-    f::ETxg
-    r::Txg
+    A::TA
+    b::AbstractVector{ETb}
+    x::AbstractVector{ETx}
+    tau::Float64
+    sigma::Float64
+    g::AbstractVector{ETg}
+    g2::AbstractVector{ETg}
+    f::Float64
+    r::AbstractVector{ETr}
     nnzIdx::Tidx
     nnzIter::Int64
     options::spgOptions
-    params::Dict{String,Number}
+    params::Dict{String,Any}
     timeProject::Float64
     timeMatProd::Float64
     exit_status::spgExitCondition  
     singleTau::Bool
-    bNorm::ETxg
-    fOld::ETxg
+    bNorm::Float64
+    fOld::Float64
     testUpdateTau::Bool
     iter::Int64
     nNewton::Int64
     printTau::Bool
     subspace::Bool
-    stepG::ETxg
-    xNorm1::Vector{ETxg}
-    rNorm2::Vector{ETxg}
-    lambda::Vector{ETxg}
+    stepG::Float64
+    xNorm1::Vector{Float64}
+    rNorm2::Vector{Float64}
+    lambda::Vector{Float64}
     lastFv::Vector{Float64} # Has to be Float64 to support Inf
-    gStep::ETxg
+    gStep::Float64
     funForward::Function
     nLineTot::Int64
     nProdAt::Int64
     nProdA::Int64
-    fBest::ETxg
-    xBest::Txg
+    fBest::Float64
+    xBest::AbstractVector{ETx}
+
 end
