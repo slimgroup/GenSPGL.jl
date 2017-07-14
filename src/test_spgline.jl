@@ -47,7 +47,7 @@ params = Dict{String, Any}([("nr", 40)
                                 ("logical", 0)
                                 ("funPenalty", funLS)])
 
-@time spgline(A,
+fNew, step, rNew, iter, err, localProdA = spgline(A,
         f,
         dx,
         gtd,

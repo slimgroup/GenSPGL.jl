@@ -572,7 +572,11 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
         r = deepcopy(b) 
         f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
     else
+        println("--------- x before ------")
+        println(x[1:5])
         x,itn = project(x,tau, timeProject, options, params)
+        println("--------- x after ------")
+        println(x[1:5])
         r = b - funForward(A, x, [], params)[1]
         nProdA += 1
         f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)

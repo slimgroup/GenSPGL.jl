@@ -240,7 +240,7 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
                 (options.verbosity > 1) && println("begin FeasLineSearch")
 
                 # Projected backtrack failed. Retry with feasible dir'n line search
-                init.x = xOld
+                init.x = copy(xOld)
 
                 # In-place scaling of gradient and updating of x
                 if ~isempty(xOld)
@@ -295,6 +295,8 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
                 end
 
                 init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
+
+                println(init.x[1:5])
             end
             
             # Failed again, Revert to Previous iterates and damp max BB step
