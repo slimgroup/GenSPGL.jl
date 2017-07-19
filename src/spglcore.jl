@@ -234,10 +234,8 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
 
             # If an error was triggered in the line search
             if (lnErr !== 0)
-                #DEVNOTE# Finish this if statement
-                println("Line Error: $(lnErr)")
 
-                (options.verbosity > 1) && println("begin FeasLineSearch")
+                (options.verbosity > 1) && println("Line Error: $lnErr \n begin FeasLineSearch")
 
                 # Projected backtrack failed. Retry with feasible dir'n line search
                 init.x = copy(xOld)
@@ -253,7 +251,7 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
                 gtd = dot(init.g,dx)
                 
                 if options.linear
-                    init.f, step, init.r, nLine, localProdA = spgline(init.A,
+                    init.f, step, init.r, nLine, lnErr, localProdA = spgline(init.A,
                                                                 init.f,
                                                                 dx,
                                                                 gtd,
@@ -268,7 +266,7 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
                                                                 options,
                                                                 init.timeProject)
                 else
-                    init.f, step, init.r, nLine, localProdA = spgline(init.A,
+                    init.f, step, init.r, nLine, lnErr, localProdA = spgline(init.A,
                                                                 init.f,
                                                                 dx,
                                                                 gtd,
@@ -342,7 +340,7 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
             else
                 init.gStep = min(options.stepMax,max(options.stepMin, real(sts/sty)))
             end
-
+            
             (options.verbosity > 1) && println("fin CompScaling")
 
         catch exc

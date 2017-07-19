@@ -4,17 +4,39 @@ include("spglinecurvy.jl")
 
 using GenSPGL
 using MAT
-var = matread("/scratch/slim/klensink/test/spglinecurvy_vars.mat")
+var = matopen("/home/slim/klensink/.julia/v0.6/GenSPGL/compare/testspglc.mat")
 
-gStep= var["gStep"]
-tau = var["tau"]
-lastFv = vec(var["lastFv"])
-b = vec(var["b"])
-x = vec(var["x"])
-g = vec(var["g"])
-params = Dict{String, Int64}()
+gStep= read(var,"gStep")
+tau = read(var,"tau")
+lastFv = vec(read(var,"lastFv"))
+b = vec(read(var,"b"))
+x = vec(read(var,"x"))
+g = vec(read(var,"g"))
 timeProject = zero(Float64)
-options = spgOptions()
-A = var["A"]
+A = NLfunForward
+opts = spgOptions(  optTol = 1e-5,
+                    bpTol = 1e-5,
+                    decTol = 1e-5,
+                    project = TraceNorm_project,
+                    primal_norm = TraceNorm_primal,
+                    dual_norm = TraceNorm_dual,
+                    proxy = true,
+                    ignorePErr = true,
+                    iterations = 150,
+                    verbosity = 1)
 
-spglinecurvy(A, x, gStep*g, maximum(lastFv), SpotFunForward, funLS, b, project, timeProject, tau, options, params)
+# Avoid anon func
+afunT(x) = reshape(x,355,709)
+params = Dict{String, Any}([("nr", 40)
+                                ("Ind", vec(b) .== 0)
+                                ("numr", 355)
+                                ("numc", 709)
+                                ("funForward", NLfunForward)
+                                ("afunT", afunT)
+                                ("afun", afun)
+                                ("mode", 1)
+                                ("ls", 1)
+                                ("logical", 0)
+                                ("funPenalty", funLS)])
+f, x, r, nLine, stepG, lnErr, localProdA = spglinecurvy(A, x, gStep*g, maximum(lastFv),
+                                A, funLS, b, project, timeProject, tau, opts, params)

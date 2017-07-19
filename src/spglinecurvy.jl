@@ -130,7 +130,8 @@ function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,
     while true
 
         xNew, tmp_itr = project(x - step*scale*g, tau, timeProject, options, params)
-        rNew = b - funForward(A, xNew, [], params)[1]::Array{ETb,1}
+        tmp1::Array{ETb,1} = funForward(A, xNew, [], params)[1]
+        rNew::Array{ETb,1} = b - tmp1
         nProd += 1
         fNew, dummy_g = funPenalty(rNew, params)
 
