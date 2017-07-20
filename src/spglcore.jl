@@ -124,6 +124,7 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
             end
 
             testRelChange1 = (abs(init.f - init.fOld) <= options.decTol * init.f)::Bool
+            
             testRelChange2 = (abs(init.f - init.fOld) <= 1e-1*init.f*(abs(rNorm - init.sigma)))
             init.testUpdateTau = ((testRelChange1 & (rNorm >  2*init.sigma)) |
                             (testRelChange2 & (rNorm <= 2*init.sigma))) &

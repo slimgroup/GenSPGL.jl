@@ -9,7 +9,7 @@ sigma = read(file,"sigma")
 
 opts = spgOptions(  optTol = 1e-5,
                     bpTol = 1e-5,
-                    decTol = 1e-5,
+                    decTol = 1e-4,
                     project = TraceNorm_project,
                     primal_norm = TraceNorm_primal,
                     dual_norm = TraceNorm_dual,
