@@ -5,7 +5,9 @@ Use: fNew,xNew,rNew,iter,step,err, nProd = spglinecurvy(x,g,fMax,funForward, fun
 Projected backtracking linesearch. On entry, g is the (possibly scaled) steepest
 descent direction. 
 """
-function spglinecurvy{TA<:AbstractArray, Tf<:Number, ETx<:Number,
+function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
+                                                        Tf<:Number,
+                                                        ETx<:Number,
                                                         ETg<:Number,
                                                         ETb<:Number}(
                                     A::TA, 
@@ -133,6 +135,8 @@ function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,
         tmp1::Array{ETb,1} = funForward(A, xNew, [], params)[1]
         rNew::Array{ETb,1} = b - tmp1
         nProd += 1
+
+        #DEVNOTE# Expensive Line
         fNew, dummy_g = funPenalty(rNew, params)
 
         s = xNew - x

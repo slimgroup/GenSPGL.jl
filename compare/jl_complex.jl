@@ -20,23 +20,24 @@ opts = spgOptions(  optTol = 1e-5,
 
 # Avoid anon func
 afunT(x) = reshape(x,355,709)
-params = Dict{String, Any}([("nr", 40)
-                                ("Ind", vec(b) .== 0)
-                                ("numr", 355)
-                                ("numc", 709)
-                                ("funForward", NLfunForward)
-                                ("afunT", afunT)
-                                ("afun", afun)
-                                ("mode", 1)
-                                ("ls", 1)
-                                ("logical", 0)
-                                ("funPenalty", funLS)])
+params = Dict("nr"=> 40,
+                "Ind"=> vec(b) .== 0,
+                "numr"=> 355,
+                "numc"=> 709,
+                "funForward"=> NLfunForward,
+                "afunT"=> afunT,
+                "afun"=> afun,
+                "mode"=> 1,
+                "ls"=> 1,
+                "logical"=> 0,
+                "funPenalty"=> funLS)
 
+BLAS.set_num_threads(8)
 @time x_LS, r, g, info = spgl1(NLfunForward, vec(b), x = vec(xinit),
                                                        tau = tau,
                                                        sigma = sigma, 
                                                        options = opts,
                                                        params = params)
-fid2 = MAT.matopen("mat_complex_sol.mat")
-mat_xLS = vec(read(fid2, "xLS"))
+#fid2 = MAT.matopen("mat_complex_sol.mat")
+#mat_xLS = vec(read(fid2, "xLS"))
 

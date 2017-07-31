@@ -5,6 +5,7 @@ module GenSPGL
 
 # Modules
 using MAT
+using JOLI
 
 # Types
 include("spgOptions.jl")

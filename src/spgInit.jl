@@ -8,7 +8,8 @@ GenSPGL Initialized local vars composite type. \n
 Passed to spglcore.jl
 
 """
-type spgInit{TA<:Union{AbstractArray, Function},ETb<:Number,
+type spgInit{TA<:Union{joAbstractLinearOperator,AbstractArray, Function},
+                                                ETb<:Number,
                                                 ETx<:Number,
                                                 ETg<:Number,
                                                 ETr<:Number,

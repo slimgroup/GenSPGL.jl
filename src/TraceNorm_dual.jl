@@ -1,10 +1,13 @@
 export TraceNorm_dual
 
-function TraceNorm_dual{ETx<:Number, Tx<:AbstractVector{ETx}}(x::Tx, weights, params::Dict{String,Any})
+function TraceNorm_dual{ETx<:Number, Tx<:AbstractVector{ETx},
+                        ETw<:Number, Tw<:AbstractArray{ETw}}(
+                        x::Tx, weights::Tw, params::Dict{String,Any})
 
-E = reshape(x, params["numr"], params["numc"])
+E = reshape(x, params["numr"]::Int, params["numc"]::Int)
 
-tmp = svds(E; nsv = 1)[1]
+#DEVNOTE# -Performance: Very expensive line
+tmp = svds(E; nsv = 1, ritzvec = false)[1]
 
 d = tmp.S[1]
 

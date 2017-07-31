@@ -54,7 +54,9 @@ export spgl1, project, SpotFunForward
     and Aleksandr Aravkin's MATLAB program SPGL1. 
 
 """
-function spgl1{ETx<:Number, ETb<:Number}(A::AbstractArray, b::AbstractVector{ETb};
+function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, ETb<:Number}(
+                    A::TA,
+                    b::AbstractVector{ETb};
                     x::AbstractVector{ETx}=Array{ETb,1}(),
                     tau::AbstractFloat=NaN,
                     sigma::AbstractFloat=NaN,
@@ -354,7 +356,10 @@ GenSPGL
 
 Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
 """
-function funCompositeR(A::AbstractArray,x::AbstractArray,r::AbstractArray,
+function funCompositeR{TA<:Union{joAbstractLinearOperator,AbstractArray}}(
+                        A::TA,
+                        x::AbstractArray,
+                        r::AbstractArray,
                         funForward::Function, funPenalty::Function, 
                         nProdAt::Int64,
                         params::Dict{String,Any})
@@ -377,7 +382,7 @@ end
 """
 Activated when an explicit or JOLI operator is passed in.
 """
-function SpotFunForward(A::AbstractArray, x::AbstractArray, g::AbstractArray, params::Dict)
+function SpotFunForward{TA<:Union{joAbstractLinearOperator,AbstractArray}}(A::TA, x::AbstractArray, g::AbstractArray, params::Dict)
     #DEVNOTE# Double check type of g once in use
 
     isempty(g) && (f = A*x)
@@ -572,11 +577,7 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
         r = deepcopy(b) 
         f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
     else
-        println("--------- x before ------")
-        println(x[1:5])
         x,itn = project(x,tau, timeProject, options, params)
-        println("--------- x after ------")
-        println(x[1:5])
         r = b - funForward(A, x, [], params)[1]
         nProdA += 1
         f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)

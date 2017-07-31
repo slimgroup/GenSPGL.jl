@@ -25,9 +25,9 @@ export spglcore
     This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, 
     and Aleksandr Aravkin's MATLAB program SPGL1. 
 """
-function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
-                    ETg<:Number, ETr<:Number, Tidx<:BitArray}(init::spgInit{TA,
-                    ETb, ETx, ETg, ETr, Tidx})
+function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},ETb<:Number,
+                    ETx<:Number, ETg<:Number, ETr<:Number, Tidx<:BitArray}(
+                    init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx})
 
     #DEVNOTE# Create spgInit type to hold all these initialized paramaters
     
@@ -50,6 +50,8 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
         gNorm = zero(ETg)
 
         if (options.proxy)
+            #@code_warntype options.dual_norm(init.g2, options.weights, init.params)
+            # prev prod: 1829
             gNorm = options.dual_norm(init.g2, options.weights, init.params)
         else
             gNorm = options.dual_norm(init.g,  options.weights, init.params)
@@ -72,10 +74,8 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
         
         nnzOld = deepcopy(init.nnzIdx)
         
-        #DEVNOTE# This line is a major performance hit 
+        #DEVNOTE# -Performance: Expensive function call 
         if ~(options.proxy) 
-
-            #@code_warntype activevars(init.x, init.g, init.nnzIdx, options, params)
             nnzX,nnzG,init.nnzIdx,nnzDiff = activevars(init.x, init.g, init.nnzIdx, options, params)
         else
             nnzX,nnzG,init.nnzIdx,nnzDiff = activevars(init.x, init.g2, init.nnzIdx, options, params)
@@ -124,8 +124,17 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
             end
 
             testRelChange1 = (abs(init.f - init.fOld) <= options.decTol * init.f)::Bool
-            
             testRelChange2 = (abs(init.f - init.fOld) <= 1e-1*init.f*(abs(rNorm - init.sigma)))
+
+            (false) && println("""
+            decTol: $(options.decTol)
+            f: $(init.f)
+            fOld: $(init.fOld)
+            $(abs(init.f - init.fOld)) <= $(options.decTol * init.f)
+            testRelChange1: $testRelChange1
+            testRelChange2: $testRelChange2
+            """)
+
             init.testUpdateTau = ((testRelChange1 & (rNorm >  2*init.sigma)) |
                             (testRelChange2 & (rNorm <= 2*init.sigma))) &
                             isnull(init.exit_status.triggered) &
@@ -160,6 +169,7 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
         # ===============================================================================
         # Print log, update history, and check exit conditions
         # ===============================================================================
+        
 
         if (options.verbosity > 0) | init.singleTau | init.printTau |
                                  (init.iter == 0) | ~isnull(init.exit_status.triggered)
@@ -212,7 +222,12 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
             # ================================================================================
 
             (options.verbosity > 1) && println("begin LineSearch")
-
+            
+            if (init.iter==21) | (init.iter==22)
+                println("""
+                    gStep = $(init.gStep)
+                """)
+            end
             init.f, init.x, init.r, nLine, init.stepG, lnErr, localProdA = spglinecurvy(init.A,
                                                                     init.x, 
                                                                     init.gStep*init.g,
@@ -229,6 +244,12 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
             (options.verbosity > 1) && println("fin LineSearch")
             init.nLineTot += nLine
             
+            if (init.iter==21 | init.iter==22)
+                println("""
+                    stepG: $(init.stepG)
+                """)
+            end
+
             if lnErr == -1
                 warn("Line Search Error not set in call to spglinecurvy")
             end
@@ -295,7 +316,6 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
 
                 init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
 
-                println(init.x[1:5])
             end
             
             # Failed again, Revert to Previous iterates and damp max BB step
@@ -324,16 +344,17 @@ function spglcore{TA<:Union{AbstractArray, Function},ETb<:Number,ETx<:Number,
             (options.verbosity > 1) && println("fin UpdateX")
 
             gOld = copy(init.g) 
+
+
             init.f, init.g, init.g2 = funCompositeR(init.A, init.x, init.r, init.funForward,
             options.funPenalty, init.nProdAt, params)
 
             # xOld plays the role of s
-            xOld = init.x - xOld
+            xOlds = init.x - xOld
 
             y = init.g - gOld
-            sts = dot(xOld,xOld)
-            sty = dot(xOld,y)
-
+            sts = dot(xOlds,xOlds)
+            sty = dot(xOlds,y)
 
             #DEVNOTE# Double check that it is okay to only compare the real part of sty
             if real(sty) <= 0
@@ -414,6 +435,7 @@ function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x:
     xTol = min(.1,10*options.optTol)
     gTol = min(.1,10*options.optTol)
 
+    #DEVNOTE# -Performance: Expensive Line
     gNorm = options.dual_norm(g,options.weights, params)
     
     if isnull(nnzIdx)
