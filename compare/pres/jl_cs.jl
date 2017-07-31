@@ -2,8 +2,8 @@
 
 # Create Restriction Operator
 using JOLI
-n = 512
-k = 20
+n = 5000
+k = 200
 
 p = randperm(n)
 x0 = zeros(n)

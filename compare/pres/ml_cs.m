@@ -2,8 +2,8 @@
 clear
 
 % Define Size of problem
-n  = 512;
-k  = 20; 
+n  = 5000;
+k  = 200; 
 
 % Create data from sparse vector
 p  = randperm(n);
