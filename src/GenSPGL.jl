@@ -35,5 +35,4 @@ include("Penalty/funLS.jl")
 
 # Examples
 include("Examples/spgdemo.jl")
-include("../compare/jl_lasso.jl")
 end # module

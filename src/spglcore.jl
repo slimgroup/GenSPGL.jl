@@ -223,11 +223,6 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
 
             (options.verbosity > 1) && println("begin LineSearch")
             
-            if (init.iter==21) | (init.iter==22)
-                println("""
-                    gStep = $(init.gStep)
-                """)
-            end
             init.f, init.x, init.r, nLine, init.stepG, lnErr, localProdA = spglinecurvy(init.A,
                                                                     init.x, 
                                                                     init.gStep*init.g,
