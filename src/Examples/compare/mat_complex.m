@@ -6,6 +6,14 @@ tic;
 [xLS,r1,g1,info1] = spgl1(@NLfunForward,b(:),tau,sigma,xinit,opts,params);
 toc
 
+% Recreate MH
+perc=0.2;
+inds =randperm(nr);
+ind =inds(1:floor(nc*0.2));
+R1  = opRestriction(nc,ind);
+R   = opKron(R1,opDirac(nr));
+MH  = opMH(nr,nc);
+
 % Reconstruct MATLAB solution and calc SNR
 e   = params.numr*params.nr;
 L  = xLS(1:e);
@@ -16,7 +24,7 @@ Drecf = reshape(MH'*vec(L*R'),nr,nc);
 SNR = -20*log10(norm(test-Drecf,'fro')/norm(test,'fro'));
 
 % Reconstruct Julia solution and calc SNR
-load('/home/slim/klensink/.julia/v0.6/GenSPGL/compare/xLS_jl.mat')
+load('/home/slim/klensink/.julia/v0.6/GenSPGL/src/Examples/compare/xLS_jl.mat')
 L_jl  = xLS_jl(1:e);
 R_jl  = xLS_jl(e+1:end);
 L_jl  = reshape(L_jl,params.numr,params.nr);

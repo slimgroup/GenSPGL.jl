@@ -44,6 +44,6 @@ BLAS.set_num_threads(8)
                                                        params = params)
 
 # Write output for MATLAB comparison
-fw = MAT.matopen("/home/slim/klensink/.julia/v0.6/GenSPGL/compare/xLS_jl.mat", "w")
+fw = MAT.matopen("/home/slim/klensink/.julia/v0.6/GenSPGL/src/Examples/compare/xLS_jl.mat", "w")
 write(fw, "xLS_jl", xLS_jl)
 close(fw)
