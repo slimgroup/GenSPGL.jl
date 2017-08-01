@@ -1,7 +1,24 @@
-# GenSPGL
+# GenSPGL.jl
+---
+A Julia solver for large scale minimization problems. 
 
-[![Build Status](https://travis-ci.org/klensink/GenSPGL.jl.svg?branch=master)](https://travis-ci.org/klensink/GenSPGL.jl)
+This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, and Aleksandr Aravkin's MATLAB program [SPGL1](http://www.cs.ubc.ca/~mpf/spgl1/). 
 
-[![Coverage Status](https://coveralls.io/repos/klensink/GenSPGL.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/klensink/GenSPGL.jl?branch=master)
+## Installation
+---
+If you have a Github account, run the following from the Julia REPL:
 
-[![codecov.io](http://codecov.io/github/klensink/GenSPGL.jl/coverage.svg?branch=master)](http://codecov.io/github/klensink/GenSPGL.jl?branch=master)
+    Pkg.clone("git@github.com:slimgroup/GenSPGL.jl.git")
+
+Otherwise run: 
+
+    Pkg.clone("https://github.com/slimgroup/GenSPGL.jl.git")
+
+## Examples
+---
+**/src/Examples/spgdemo.jl**
+* Example using both implicit and explicit **__A__**.
+
+**/src/Examples/compare/**
+* Example using a non linear forward function as **__A__**
+
