@@ -30,9 +30,12 @@ include("TraceNorm_primal.jl")
 include("afun.jl")
 
 # Penalties
-#DEVNOTE# Obviously generalize these paths
 include("Penalty/funLS.jl")
 
 # Examples
-include("Examples/spgdemo.jl")
+#include("Examples/spgdemo.jl")
+include("Examples/compare/jl_cs.jl")
+include("Examples/compare/jl_complex.jl")
+
+
 end # module

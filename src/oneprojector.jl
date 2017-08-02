@@ -34,11 +34,8 @@ ONEPROJECTOR  Projects b onto the weighted one-norm ball of radius tau
    oneprojector.m 1200 2008-11-21 19:58:28Z mpf 
 ================================================================================
 """
-#DEVNOTE# Eventually use multiple dispatch to support scalar weights
 function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
 
-    # This function is type stable except for 2 temp variables.
-    # They shouldnt be a performance issue 
     
     len_d = length(d)
     len_b = length(b)
@@ -73,7 +70,7 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
         
         d_abs = abs(d)
         idx = find(d .> eps())
-        x = deepcopy(b_abs) #DEVNOTE# Double check avoiding referencing is necessary
+        x = deepcopy(b_abs) 
         x[idx],itn = oneprojectormex(b_abs[idx], d[idx], tau)
     end
    
@@ -137,11 +134,16 @@ end
 """
 Use: x,itn = oneprojectormex(b::Abstractvector, d::AbstractVector, tau::Number)
 """
-function oneprojectormex{Tb<:Number,Td<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Td}, tau::Number)
+function oneprojectormex{Tb<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Tb}, tau::Number)
     
 
     #Get type of b.*d
-    Tdb = promote_rule(Td,Tb)
+    Tdb = Tb
+
+    println("""
+    Tb: $(Tb)
+    Tdb: $(Tdb)
+    """)
 
     len_d = length(d)
     len_b = length(b)
@@ -154,9 +156,11 @@ function oneprojectormex{Tb<:Number,Td<:Number}(b::AbstractVector{Tb}, d::Abstra
     x = zeros(Tdb,n,1)
     
     # Preprocessing
-    idx = sortperm_col(b./d, rev = true)
+    bd = b./d
+    idx = sortperm_col(bd, rev = true)
     b_sort = b[idx]
     d_sort = d[idx]
+    bd_sort = bd[idx]
 
     # Optimize
     csdb = zero(Tdb)

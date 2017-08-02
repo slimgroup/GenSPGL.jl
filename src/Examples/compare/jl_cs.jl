@@ -27,7 +27,8 @@ function jl_cs()
     b = R*A*x0
 
     # Solve
-    opts = spgOptions(optTol = 1e-4, verbosity = 1)
+    opts = spgOptions(optTol = 1e-4,
+                         verbosity = 1)
 
     @time x, r, g, info = spgl1(R*A, vec(b), tau = 0., sigma = 1e-3, options = opts) 
 

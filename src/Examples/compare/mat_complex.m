@@ -1,5 +1,8 @@
 clear;
-addpath(genpath('/home/Software/slim/SLIM-release-apps/tools/solvers/GenSPGL1/'));
+
+% Prepend this path appropriately 
+mypath = '/home/Software/slim/';
+addpath(genpath([mypath 'SLIM-release-apps/tools/solvers/GenSPGL1/']));
 load('vars_complex.mat')
 sigma = 1e-2*norm(vec(b),'fro');
 tic;
@@ -24,7 +27,7 @@ Drecf = reshape(MH'*vec(L*R'),nr,nc);
 SNR = -20*log10(norm(test-Drecf,'fro')/norm(test,'fro'));
 
 % Reconstruct Julia solution and calc SNR
-load('/home/slim/klensink/.julia/v0.6/GenSPGL/src/Examples/compare/xLS_jl.mat')
+load('xLS_jl.mat')
 L_jl  = xLS_jl(1:e);
 R_jl  = xLS_jl(e+1:end);
 L_jl  = reshape(L_jl,params.numr,params.nr);
