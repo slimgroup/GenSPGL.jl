@@ -9,6 +9,10 @@ Aleksandr Aravkin's MATLAB program [SPGL1](http://www.cs.ubc.ca/~mpf/spgl1/).
 
 ## Installation
 
+GenSPGL requires the JOLI package. If it isn't already installed run the following from the Julia REPL:
+
+    Pkg.clone("https://github.com/slimgroup/JOLI.jl.git")
+
 GenSPGL can be installed using the Julia package manager.
 If you have a Github account, run the following from the Julia REPL:
 
@@ -17,6 +21,7 @@ If you have a Github account, run the following from the Julia REPL:
 Otherwise run: 
 
     Pkg.clone("https://github.com/slimgroup/GenSPGL.jl.git")
+
 ## Examples
 
 The scripts for the following examples have been included in the package in the package directory. 
