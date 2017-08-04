@@ -7,7 +7,7 @@ An example of using implicit JOLI operators to solve a system using GenSPGL
 Use: x, r, g, info, SNR = jl_cs()
 """
 function jl_cs()
-    n = 5000
+    n = 1024
     k = 200
 
     # Create a system
@@ -16,7 +16,7 @@ function jl_cs()
     x0[p[1:k]] = sign.(randn(k))
 
     # Create a modelling op
-    A = joMatrix(randn(n,n))
+    F = joDFT(n)
     
     # Create a restriction op
     ind = randperm(n)
