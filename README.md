@@ -47,7 +47,7 @@ For additional information of the ouput, see the package documentation.
 
     help?> spgl1
 
-### Non Linear Function Modelling Operators and Complex Data
+### Factorization Based Rank Minimization 
 **/src/Examples/compare/jl_complex.jl**
 
 This example loads a subsampled frequency slice from a seismic data set, and recovers it using factorization based rank-minimization framework.
