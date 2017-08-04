@@ -1,6 +1,9 @@
 %% ML-JL SPGL Comparison
 clear
 
+mypath = '/home/Software/slim/';
+addpath(genpath([mypath 'SLIM-release-apps/tools/solvers/GenSPGL1/']));
+
 % Define Size of problem
 %n  = 1024;
 %k  = 50; 
