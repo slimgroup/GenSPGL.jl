@@ -16,7 +16,7 @@ function ex_cs()
     #x0[inds[1:10]] = randn(10)
 
     # Load sparse vector x and restriction mask
-    fid = matopen("x0.mat")
+    fid = matopen(Pkg.dir("GenSPGL")*"/src/Examples/pres/x0.mat")
     x0 = vec(read(fid, "x0"))
     r_inds = Int.(vec(read(fid, "r_inds")))
     n = length(vec(x0))
