@@ -5,7 +5,7 @@ Use: NormL1_primal(x::AbstractArray, weights::Number, params::Dict)
 """
 function NormL1_primal{ETx<:AbstractFloat}(x::AbstractVector{ETx}, weights::Number, params::Dict)::ETx
 
-    d = norm(x*weights, Inf)
+    d = norm(x*weights, 1)
 
 end
 
@@ -15,7 +15,7 @@ end
 function NormL1_primal{ETx<:AbstractFloat}(x::AbstractVector{ETx},
                                     weights::AbstractVector, params::Dict)::ETx
 
-    d = norm(x.*weights, Inf)
+    d = norm(x.*weights, 1)
 
 end
 

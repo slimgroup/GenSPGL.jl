@@ -315,9 +315,9 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
                     init.timeProject,
                     init.timeMatProd,
                     init.options,
-                    init.xNorm1,
-                    init.rNorm2,
-                    init.lambda)
+                    init.xNorm1[1:init.iter],
+                    init.rNorm2[1:init.iter],
+                    init.lambda[1:init.iter])
 
     if (options.verbosity > 0) 
         println("-------------------------------------------------------------------------
@@ -655,9 +655,9 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
                     init.timeProject,
                     init.timeMatProd,
                     init.options,
-                    init.xNorm1,
-                    init.rNorm2,
-                    init.lambda)
+                    init.xNorm1[1:init.iter],
+                    init.rNorm2[1:init.iter],
+                    init.lambda[1:init.iter])
 
     if (options.verbosity > 0) 
         println("-------------------------------------------------------------------------

@@ -141,7 +141,8 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
                             ~init.testUpdateTau
 
             if init.testUpdateTau
-
+                
+                (options.verbosity > 1) && warn("Update Tau")
                 if (options.quitPareto & (init.iter >= options.minPareto)) 
                     init.exit_status.triggered = 10
                 end
@@ -153,6 +154,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
                 init.printTau = (abs(tauOld - init.tau) >= (1e-6 * init.tau)) 
 
                 if init.tau < tauOld
+                    (options.verbosity > 1) && warn("Tau Decreasing")
                     init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
                 end
 
@@ -222,7 +224,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             # ================================================================================
 
             (options.verbosity > 1) && println("begin LineSearch")
-            
+            (options.verbosity > 1) && println("Tau: $(init.tau)") 
             init.f, init.x, init.r, nLine, init.stepG, lnErr, localProdA = spglinecurvy(init.A,
                                                                     init.x, 
                                                                     init.gStep*init.g,

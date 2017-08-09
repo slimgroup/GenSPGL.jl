@@ -40,6 +40,7 @@ function ex_cs()
     # Solve
     opts = spgOptions(verbosity = 1)
     x, r, g, info = spgl1(A, b, options = opts) 
+    #t = spgl1(A, b, options = opts) 
 
     # Solve again silently for timing
     opts = spgOptions(verbosity = 0)
@@ -53,6 +54,7 @@ function ex_cs()
     write(fw, "x_jl", x)
     write(fw, "t_jl", t_jl)
     close(fw)
-   
+  
     return x, r, g, info, SNR
+    #return t 
 end
