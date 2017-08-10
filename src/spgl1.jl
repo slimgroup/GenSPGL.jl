@@ -207,16 +207,16 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
         (logheader_2 = """
     Target reg. Norm of x   :$(tau)\n
 
-    Iter    Objective      Relative_Error  gNorm         stepG     nnzX       nnzG
-    --------------------------------------------------------------------------------
+    Iter    Objective      Relative_Error  gNorm         stepG
+    ------------------------------------------------------------------------
     """)
 
     else 
         (logheader_2 = """
     Target Objective        :$(sigma)\n
 
-    Iter   Objective      Relative_Error  RelError  gNorm         stepG    nnzX    nnzG  tau
-    -----------------------------------------------------------------------------------------------
+    Iter   Objective      Relative_Error  RelError  gNorm        stepG  tau
+    ----------------------------------------------------------------------------------------
     """)
     end
     
@@ -320,8 +320,7 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
                     init.lambda[1:init.iter])
 
     if (options.verbosity > 0) 
-        println("-------------------------------------------------------------------------
-                -----------\n")
+        println("-----------------------------------------------------------------------\n")
         print(info.exit_status)
     end
     

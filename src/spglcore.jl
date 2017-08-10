@@ -70,7 +70,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
         rError1 = abs(aError1) / max(1,rNorm)
         rError2 = abs(aError2) / max(1,init.f)
 
-        # Count number of consecutive iterations with identical support
+        #= Count number of consecutive iterations with identical support
         
         nnzOld = deepcopy(init.nnzIdx)
         
@@ -96,6 +96,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             tmp_nnzX2::BitArray{1} = (abs.(init.x) .>= tmp_nnzX1)
             nnzX = sum(tmp_nnzX2)
         end
+        =#
 
         # SingleTau, check if optimal
         # Second condition guards against large tau
@@ -178,7 +179,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
 
             if init.singleTau
                 
-                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f   %6i     %6i" init.iter rNorm rErr gNorm log10(init.stepG) nnzX nnzG
+                s = @sprintf "%5i   %13.7e  %13.7e  %9.2e   %6.1f" init.iter rNorm rErr gNorm log10(init.stepG) #nnzX nnzG
                 (options.verbosity > 0) && println(s)
 
                 if init.subspace
@@ -187,9 +188,9 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             else
                 
                 if init.printTau | init.subspace
-                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i  %13.7e" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG init.tau
+                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %13.7e" init.iter rNorm rErr rError1 gNorm log10(init.stepG) #=nnzX nnzG=# init.tau
                 else
-                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f  %6i  %6i" init.iter rNorm rErr rError1 gNorm log10(init.stepG) nnzX nnzG
+                    s = @sprintf "%5i  %13.7e  %13.7e  %9.2e  %9.3e  %6.1f" init.iter rNorm rErr rError1 gNorm log10(init.stepG) #nnzX nnzG
                 end
                     (options.verbosity > 0) && println(s)
             end
