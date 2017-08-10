@@ -8,8 +8,7 @@ export NormL1_project
 Use: x,itn = NormL1_project(x,weights,tau)
 
 """
-function NormL1_project{ETx<:Number,Tx<:AbstractVector{ETx}}(x::Tx, tau::Number,
-                                                weights, params)::Tuple{Tx,Int64}
+function NormL1_project(x::AbstractVector{<:Real}, tau::Number, weights, params)
     
     x_out,itn = oneprojector(x, weights, tau)
     
@@ -21,10 +20,9 @@ end
 """
 For Complex
 """
-function NormL1_project{ETx<:Complex,Tx<:AbstractVector{ETx}}(x::Tx, tau::Number, 
-                                                weights, params)::Tuple{Tx,Int64}
+function NormL1_project(x::AbstractVector{<:Complex}, tau::Number, weights, params)
 
-    xa = abs(x)
+    xa = abs.(x)
     idx = find(xa .< eps())
     xc,itn = oneprojector(xa, weights, tau)
     xc = xc ./ xa

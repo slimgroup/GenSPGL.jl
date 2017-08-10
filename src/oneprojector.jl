@@ -68,7 +68,7 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
 
     else
         
-        d_abs = abs(d)
+        d_abs = abs.(d)
         idx = find(d .> eps())
         x = deepcopy(b_abs) 
         x[idx],itn = oneprojectormex(b_abs[idx], d[idx], tau)
@@ -85,9 +85,9 @@ end
 oneprojectormex for scalar weight
 oneprojectormex_I clone
 """
-function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::AbstractFloat)
+function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::Number)
 
-    tau = tau/abs(d)
+    tau = tau/abs.(d)
     len_b = length(b)
     
     #Initialization
@@ -134,16 +134,11 @@ end
 """
 Use: x,itn = oneprojectormex(b::Abstractvector, d::AbstractVector, tau::Number)
 """
-function oneprojectormex{Tb<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Tb}, tau::Number)
+function oneprojectormex(b::AbstractVector{<:Number}, d::AbstractVector{<:Number}, tau::Number)
     
 
     #Get type of b.*d
-    Tdb = Tb
-
-    println("""
-    Tb: $(Tb)
-    Tdb: $(Tdb)
-    """)
+    Tdb = promote_type(eltype(b), eltype(d))
 
     len_d = length(d)
     len_b = length(b)
@@ -154,14 +149,14 @@ function oneprojectormex{Tb<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Tb
 
     n = len_b
     x = zeros(Tdb,n,1)
-    
+   
     # Preprocessing
     bd = b./d
     idx = sortperm_col(bd, rev = true)
     b_sort = b[idx]
     d_sort = d[idx]
     bd_sort = bd[idx]
-
+    
     # Optimize
     csdb = zero(Tdb)
     csd2 = zero(Tdb)
@@ -171,11 +166,11 @@ function oneprojectormex{Tb<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Tb
     i = 1
 
     while i <= n
-        csdb += d[i].*b[i]
+        csdb += d_sort[i].*b_sort[i]
         csd2 = csd2 + d[i].*d[i]
 
         alpha1 = (csdb - tau)/ csd2
-        alpha2 = bd[i]
+        alpha2 = bd_sort[i]
 
         (alpha1 >= alpha2) && break
 
@@ -183,7 +178,7 @@ function oneprojectormex{Tb<:Number}(b::AbstractVector{Tb}, d::AbstractVector{Tb
         i += 1
     end
 
-    x[idx[1:i-1]] = b[1:i-1] - d[1:i-1]*max(0,soft)
+    x[idx[1:i-1]] = b_sort[1:i-1] - d_sort[1:i-1]*max(0,soft)
     itn = i
 
     return x,itn

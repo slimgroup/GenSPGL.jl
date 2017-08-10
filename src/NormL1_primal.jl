@@ -1,19 +1,14 @@
 export NormL1_primal
 
 """
-Use: NormL1_primal(x::AbstractArray, weights::Number, params::Dict)
+     NormL1_primal( x::AbstractArray{<:Number}, 
+                    weights<:Union{AbstractVector, Number}, 
+                    params::Dict{String, Any})
 """
-function NormL1_primal{ETx<:AbstractFloat}(x::AbstractVector{ETx}, weights::Number, params::Dict)::ETx
-
-    d = norm(x*weights, 1)
-
-end
-
-"""
-     NormL1_primal(x::AbstractArray, weights::AbstractArray, params::Dict)
-"""
-function NormL1_primal{ETx<:AbstractFloat}(x::AbstractVector{ETx},
-                                    weights::AbstractVector, params::Dict)::ETx
+function NormL1_primal{Tw<:Union{AbstractVector, Number}, ETx<:Number}(
+                                    x::AbstractVector{ETx},
+                                    weights::Tw,
+                                    params::Dict{String, Any})
 
     d = norm(x.*weights, 1)
 
