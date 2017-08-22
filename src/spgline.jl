@@ -62,7 +62,7 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
         end
 
         iter += 1
-
+        (options.verbosity > 1) && println("Line Search Iter: $iter")
         if step <= 0.1
             step /= 2
         else

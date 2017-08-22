@@ -7,13 +7,14 @@ function TraceNorm_project{ETx<:Number, Tx<:AbstractVector{ETx}}(x::Tx, B, weigh
 
 e = params["numr"] * params["nr"]
 
-@inbounds L = x[1:e]
-@inbounds R = x[(e+1):end]
+L = x[1:e]
+R = x[(e+1):end]
 
 L = reshape(L, params["numr"], params["nr"])
 R = reshape(R, params["numc"], params["nr"])
 
 c = sqrt(B/(0.5*norm(x).^2))
+
 Lout = min(1,c)*vec(L)
 Rout = min(1,c)*vec(R)
 

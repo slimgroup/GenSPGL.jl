@@ -68,6 +68,7 @@ function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
             break
         end
 
+        (options.verbosity > 1) && println("Line Search Curvy Iter: $iter")
         #New linesearch iteration
         iter += 1
         step /= 2
@@ -91,9 +92,7 @@ function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
     return fNew, xNew, rNew, iter, step, err, nProd 
 end
 
-function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,
-                                                        ETg<:Number,
-                                                        ETb<:Number}(
+function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,ETg<:Number, ETb<:Number}(
                                     A::TA, 
                                     x::AbstractArray{ETx}, 
                                     g::AbstractArray{ETg}, 

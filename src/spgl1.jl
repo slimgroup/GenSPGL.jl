@@ -201,7 +201,7 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
     Maximum Iterations      :$(options.iterations)
     """
    
-    println("singleTau: ", singleTau)
+    options.verbosity > 1 && println("singleTau: ", singleTau)
 
     if singleTau 
         (logheader_2 = """
@@ -540,22 +540,22 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
     Maximum Iterations      :$(options.iterations)
     """
    
-    println("singleTau: ", singleTau)
+    options.verbosity > 1 && println("singleTau: ", singleTau)
 
     if singleTau 
         (logheader_2 = """
     Target reg. Norm of x   :$(tau)\n
 
-    Iter    Objective      Relative_Error  gNorm         stepG     nnzX       nnzG
-    --------------------------------------------------------------------------------
+    Iter    Objective      Relative_Error  gNorm         stepG 
+    -------------------------------------------------------------------
     """)
 
     else 
         (logheader_2 = """
     Target Objective        :$(sigma)\n
 
-    Iter   Objective      Relative_Error  RelError  gNorm         stepG    nnzX    nnzG  tau
-    -----------------------------------------------------------------------------------------------
+    Iter   Objective      Relative_Error  RelError  gNorm         stepG  tau
+    -------------------------------------------------------------------------
     """)
     end
     
@@ -584,7 +584,7 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
         dx = dx_tmp - x
         itn += itn_tmp
     end
-       
+
     dxNorm = norm(dx,Inf)
     if dxNorm < (1/options.stepMax)
         gStep = options.stepMax
@@ -599,7 +599,7 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
     fOld = copy(f)
 
     (options.verbosity > 1) && println("Init Finished")
-
+    
     # Wrap up initialized variables
     init = spgInit(A,
                     b,
@@ -637,9 +637,14 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
                     nProdA,
                     fBest,
                     xBest)
-                    
+    
+    #DEVNOTE# Catch output for debug
+    if false
+        out  = spglcore(init)
+        return out
+    end
+
     # Wrap main loop in a function to ease type stability
-    #@code_warntype spglcore(init)
     init, rNorm, gNorm, rErr  = spglcore(init)
     # Prepare output
     info = spgInfo(  init.tau,

@@ -242,12 +242,6 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             (options.verbosity > 1) && println("fin LineSearch")
             init.nLineTot += nLine
             
-            if (init.iter==21 | init.iter==22)
-                println("""
-                    stepG: $(init.stepG)
-                """)
-            end
-
             if lnErr == -1
                 warn("Line Search Error not set in call to spglinecurvy")
             end
@@ -262,6 +256,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
 
                 # In-place scaling of gradient and updating of x
                 if ~isempty(xOld)
+
                     dx = project(xOld - init.gStep.*init.g, init.tau, init.timeProject,
                                                             options, params)[1] - xOld
                 else
@@ -269,7 +264,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
                 end
 
                 gtd = dot(init.g,dx)
-                
+
                 if options.linear
                     init.f, step, init.r, nLine, lnErr, localProdA = spgline(init.A,
                                                                 init.f,

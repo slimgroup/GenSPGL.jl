@@ -36,6 +36,8 @@ include("Penalty/funLS.jl")
 #include("Examples/spgdemo.jl")
 include("Examples/compare/jl_cs.jl")
 include("Examples/pres/ex_cs.jl")
+include("Examples/scaletest/scale_cs.jl")
+include("Examples/scaletest/scale_test.jl")
 include("Examples/compare/jl_complex.jl")
 
 end # module
