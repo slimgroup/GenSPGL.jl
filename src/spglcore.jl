@@ -403,7 +403,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             rNorm = init.f
         else
             (options.verbosity > 0) && println("""
-                Note: Solution not actually optimal. Best objective value is $fBest
+                Note: Solution not actually optimal. Best objective value is $(init.fBest)
                 """)
         end
     end

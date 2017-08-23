@@ -53,7 +53,11 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
         fNew = funPenalty(rNew, params)[1]
 
         # Check exit conditions
-        if fNew < fMax + gamma*step*gtd
+        (options.verbosity > 1) && println(""" fNew: $fNew
+                    fMax: $(fMax)
+                    add $(gamma*step*gtd)""")
+        #DEVNOTE# added the =
+        if fNew <= fMax + gamma*step*gtd
             err = EXIT_CONVERGED
             break
         elseif iter >= maxIts
@@ -66,7 +70,7 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
         if step <= 0.1
             step /= 2
         else
-            tmp = (-gtd*step^2)/(2*(fNew-f-step*gtd))::real(ETx)
+            tmp = (-gtd*step^2)/(2*(fNew-f-step*gtd))
             if (tmp < 0.1) | (tmp > 0.9*step) | (isnan(tmp))
                 tmp = step/2
             end

@@ -40,7 +40,7 @@ function data_load()
 
     Df = reshape(permutedims(Df,[1, 3, 2, 4]), 202*102, 202*102)
     D_sub = copy(Df)
-    D_sub[Mask] = zero(eltype(D_sub))
+    D_sub[.~Mask] = zero(eltype(D_sub))
     
     return D_sub, Mask
 end
@@ -55,8 +55,8 @@ function scale_test(D_sub, Mask)
                         dual_norm = GenSPGL.TraceNorm_dual,
                         proxy = true,
                         ignorePErr = true,
-                        iterations = 200,
-                        verbosity = 2)
+                        iterations = 50,
+                        verbosity = 1)
 
     
     nr, nc = size(D_sub)
@@ -81,6 +81,6 @@ function scale_test(D_sub, Mask)
     t = GenSPGL.spgl1(NLfunForward_local, vec(D_sub), x = vec(xinit),
                                                            options = opts,
                                                            params = params,
-                                                           tau = 3.14e4)
+                                                           tau = 3.14e1)
     return t
 end
