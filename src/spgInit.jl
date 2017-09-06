@@ -32,7 +32,7 @@ type spgInit{TA<:Union{joAbstractLinearOperator,AbstractArray, Function},
     timeMatProd::Float64
     exit_status::spgExitCondition  
     singleTau::Bool
-    bNorm::Float64
+    bNorm::AbstractFloat
     fOld::Float64
     testUpdateTau::Bool
     iter::Int64
