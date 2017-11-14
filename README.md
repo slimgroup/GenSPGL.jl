@@ -5,7 +5,14 @@ GenSPGL supports implicit arrays(JOLI), explicit arrays, and functions as modell
 operators **__A__**.
 
 This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, and
-Aleksandr Aravkin's MATLAB program [SPGL1](http://www.cs.ubc.ca/~mpf/spgl1/). 
+Aleksandr Aravkin's MATLAB program [SPGL1](http://www.cs.ubc.ca/~mpf/spgl1/).
+
+Please note that while it is largely based off of SPGL1, this package is NOT a direct port of SPGL1. Various changes have been made to generalize the solver and make it more applicable to SLIM's research on large datasets. 
+
+Noteable changes include: 
+* **__A__** can be non-linear
+* L1 and L2 projections
+* Nuclear or L1 norms and their corresponding dual norms
 
 ## Installation
 
