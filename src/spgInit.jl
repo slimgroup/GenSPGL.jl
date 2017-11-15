@@ -18,11 +18,11 @@ type spgInit{TA<:Union{joAbstractLinearOperator,AbstractArray, Function},
     A::TA
     b::AbstractVector{ETb}
     x::AbstractVector{ETx}
-    tau::Float64
+    tau::AbstractFloat
     sigma::Number
     g::AbstractVector{ETg}
     g2::AbstractVector{ETg}
-    f::Float64
+    f::AbstractFloat
     r::AbstractVector{ETr}
     nnzIdx::Tidx
     nnzIter::Int64
@@ -33,7 +33,7 @@ type spgInit{TA<:Union{joAbstractLinearOperator,AbstractArray, Function},
     exit_status::spgExitCondition  
     singleTau::Bool
     bNorm::AbstractFloat
-    fOld::Float64
+    fOld::AbstractFloat
     testUpdateTau::Bool
     iter::Int64
     nNewton::Int64
@@ -49,7 +49,7 @@ type spgInit{TA<:Union{joAbstractLinearOperator,AbstractArray, Function},
     nLineTot::Int64
     nProdAt::Int64
     nProdA::Int64
-    fBest::Float64
+    fBest::AbstractFloat
     xBest::AbstractVector{ETx}
 
 end

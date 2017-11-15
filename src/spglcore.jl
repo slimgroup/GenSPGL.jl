@@ -377,6 +377,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             println("""
             ================================================================================ 
             """)
+            break
         end
 
         # ================================================================================

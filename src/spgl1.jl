@@ -1,6 +1,6 @@
 # SPGL
 
-export spgl1, project, SpotFunForward
+export spgl1, project, SpotFunForward, snr
 
 """
 # INFO 
@@ -27,7 +27,7 @@ export spgl1, project, SpotFunForward
     sigma:
         - If sigma != NaN then GenSPGL will launch into a root-finding mode to find the 
             tau above that solves. In this case it is STRONGLY recommended that tau = 0.\n
-    x0:
+    x:
         - An n-vector estimate of the solution (possibly all zeros). If empty, then
             GenSPGL determines the legnth n via n = length(A'b) and sets x0 = zeros(n).\n
     options:
@@ -98,7 +98,11 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
     # Threshold for signifigant Newton step
     pivTol = 1e-12
 
-
+    # Account for precision of data format in line search
+    if options.stepMin < eps(real(ETx))
+        options.stepMin = 10 * eps(real(ETx))
+        warn("options.stepMin is below the precision of the data type. Setting to 10*eps(DT)")
+    end
 
     ##--------------------------------------------------------------------------------
     # Initialize Local Variables
@@ -150,8 +154,6 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
 
     # Override if complex flag was used
     isnull(options.iscomplex) || (realx = ~get(options.iscomplex))
-
-
     
     # Check if all weights (if any) are strictly positive. In previous
     # versions we also checked if the number of weights was equal to
@@ -303,7 +305,7 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
     init, rNorm, gNorm, rErr  = spglcore(init)
 
     # Prepare output
-    info = spgInfo(  init.tau,
+    info = spgInfo( init.tau,
                     rNorm,
                     gNorm,
                     rErr,
@@ -442,7 +444,11 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
     # Threshold for signifigant Newton step
     pivTol = 1e-12
 
-
+    # Account for precision of data format in line search
+    if options.stepMin < eps(real(ETx))
+        options.stepMin = 10 * eps(real(ETx))
+        warn("options.stepMin is below the precision of the data type. Setting to 10*eps(DT)")
+    end
 
     ##--------------------------------------------------------------------------------
     # Initialize Local Variables
@@ -471,11 +477,10 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
 
     # Determine Initial x, vector length n, and check if complex
     # Explicit Method
-    #DEVNOTE# Change name to JOLI  once things are working
     funForward = A
 
     if isempty(x)
-        x_tmp = funForward(A, x, -b) #DEVNOTE# Check to make sure this is tmp
+        x_tmp = funForward(A, x, -b) 
         n = length(x_tmp)
         realx = isreal(x_tmp) & isreal(b)
 
@@ -489,8 +494,6 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
 
     # Override if complex flag was used
     isnull(options.iscomplex) || (realx = ~get(options.iscomplex))
-
-
     
     # Check if all weights (if any) are strictly positive. In previous
     # versions we also checked if the number of weights was equal to
@@ -584,7 +587,7 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
         dx = dx_tmp - x
         itn += itn_tmp
     end
-    println("f: $f")
+
     dxNorm = norm(dx,Inf)
     if dxNorm < (1/options.stepMax)
         gStep = options.stepMax
@@ -638,12 +641,6 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
                     fBest,
                     xBest)
     
-    #DEVNOTE# Catch output for debug
-    if false
-        out  = spglcore(init)
-        return out
-    end
-
     # Wrap main loop in a function to ease type stability
     init, rNorm, gNorm, rErr  = spglcore(init)
     # Prepare output
@@ -694,5 +691,4 @@ function funCompositeR(A::Function,x::AbstractArray,r::AbstractArray,
     return f,g1,g2
 end
 
-
-
+snr(raw,interp) = -20log10(vecnorm(interp-raw)/vecnorm(raw))

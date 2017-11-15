@@ -19,7 +19,7 @@ function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
                                     b::AbstractVector{ETb}, 
                                     project::Function,
                                     timeProject::Float64,
-                                    tau::Float64, 
+                                    tau::AbstractFloat,
                                     options::spgOptions,
                                     params::Dict{String,Any})
 
@@ -48,10 +48,10 @@ function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
     while true
 
         xNew, tmp_itr = project(x - step*scale*g, tau, timeProject, options, params)
-        rNew = b - funForward(A, xNew, Array{ETx,1}(), params)::Array{ETb,1}
+        #rNew = b - funForward(A, xNew, Array{ETx,1}(), params)::Array{ETb,1}
+        rNew = b - funForward(A, xNew, Array{ETx,1}(), params)
         nProd += 1
         fNew, dummy_g = funPenalty(rNew, params)
-
 
         s = xNew - x
         gts = scale * real(g'*s)
