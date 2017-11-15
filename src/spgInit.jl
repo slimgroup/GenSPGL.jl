@@ -19,7 +19,7 @@ type spgInit{TA<:Union{joAbstractLinearOperator,AbstractArray, Function},
     b::AbstractVector{ETb}
     x::AbstractVector{ETx}
     tau::Float64
-    sigma::Float64
+    sigma::Number
     g::AbstractVector{ETg}
     g2::AbstractVector{ETg}
     f::Float64

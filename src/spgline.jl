@@ -31,7 +31,7 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
     gtd = -abs(gtd_in)
 
     if linear
-        Ad = funForward(A, d, [], params)[1]::Array(ETb,1)
+        Ad = funForward(A, d, Arrat{ETX,1}(), params)[1]::Array(ETb,1)
         localProdA += 1
         r = copy(x)
     end
@@ -46,7 +46,7 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
         if linear
             rNew = r - step*Ad
         else
-            rNew = b - funForward(A, x + step*d, [], params)[1]
+            rNew = b - funForward(A, x + step*d, Array{ETx,1}(), params)[1]
             localProdA += 1
         end
 

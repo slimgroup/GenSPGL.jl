@@ -140,7 +140,7 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
             n = length(x)
             realx = isreal(x) & isreal(b)
         end
-        x = zeros(n)
+        x = zeros(ETb, n)
     else
         n = length(x)
         realx = isreal(x) & isreal(A)
@@ -577,14 +577,14 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
         f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
     else
         x,itn = project(x,tau, timeProject, options, params)
-        r = b - funForward(A, x, [], params)[1]
+        r = b - funForward(A, x, Array{ETx,1}(), params)[1]
         nProdA += 1
         f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
         dx_tmp, itn_tmp = project(x-g, tau, timeProject, options, params)
         dx = dx_tmp - x
         itn += itn_tmp
     end
-
+    println("f: $f")
     dxNorm = norm(dx,Inf)
     if dxNorm < (1/options.stepMax)
         gStep = options.stepMax
@@ -664,8 +664,7 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
                     init.lambda[1:init.iter])
 
     if (options.verbosity > 0) 
-        println("-------------------------------------------------------------------------
-                -----------\n")
+        println("---------------------------------------------------------------------------\n")
         print(info.exit_status)
     end
     

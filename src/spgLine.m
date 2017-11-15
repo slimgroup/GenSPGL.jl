@@ -57,7 +57,7 @@ tmp = step / 2;
 end
 step = tmp;
 end
-
+sprintf('Iter: %3d, fNew: %10.10f, fMax: %10.10f', iter, fNew, fMax)
 end % while 1
 
 end % function spgLine

@@ -59,6 +59,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
         
         # rNorm and f are the same thing
         rNorm = copy(init.f)
+        #println("rNorm = $rNorm")
 
         tmp_proj, tmp_itn = project(init.x - init.g,
                                         init.tau, init.timeProject, options, params)
@@ -157,6 +158,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
                 if init.tau < tauOld
                     (options.verbosity > 1) && warn("Tau Decreasing")
                     init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
+
                 end
 
             end
@@ -226,6 +228,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
 
             (options.verbosity > 1) && println("begin LineSearch")
             (options.verbosity > 1) && println("Tau: $(init.tau)") 
+
             init.f, init.x, init.r, nLine, init.stepG, lnErr, localProdA = spglinecurvy(init.A,
                                                                     init.x, 
                                                                     init.gStep*init.g,
@@ -237,10 +240,11 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
                                                                     init.timeProject,
                                                                     init.tau,
                                                                     options,
-                                                                    params)            
-            
+                                                                    params)
+
             (options.verbosity > 1) && println("fin LineSearch")
             init.nLineTot += nLine
+            init.nProdA += localProdA
             
             if lnErr == -1
                 warn("Line Search Error not set in call to spglinecurvy")
@@ -266,6 +270,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
                 gtd = dot(init.g,dx)
 
                 if options.linear
+
                     init.f, step, init.r, nLine, lnErr, localProdA = spgline(init.A,
                                                                 init.f,
                                                                 dx,
@@ -281,6 +286,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
                                                                 options,
                                                                 init.timeProject)
                 else
+
                     init.f, step, init.r, nLine, lnErr, localProdA = spgline(init.A,
                                                                 init.f,
                                                                 dx,
@@ -364,7 +370,9 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             println("""
             ===============================CAUGHT_ERROR===================================== 
             """)
-            throw(exc)
+            println("ERROR: ", exc) 
+
+            display(catch_stacktrace())
 
             println("""
             ================================================================================ 
@@ -392,7 +400,7 @@ function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},E
             rNorm = init.fBest
             (options.verbosity > 1) && println("Restoring best iterate to objective: $(rNorm)")
             init.x = init.xBest
-            init.r = init.b - init.funForward(init.A, init.x, [], params)
+            init.r = init.b - init.funForward(init.A, init.x, Array{ETx,1}(), params)
             init.f, init. g, init.g2 = funCompositeR(init.A, init.x, init.r, init.funForward,
                                             options.funPenalty, init.nProdAt, params)
             if options.proxy
@@ -471,5 +479,6 @@ function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x:
     end
 
     return nnzX, nnzG, nnzIdx, nnzDiff
-
 end
+
+mtypeof(c...) = [typeof(a) for a in c]
