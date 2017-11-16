@@ -300,7 +300,7 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
                     nProdA,
                     fBest,
                     xBest)
-                    
+    
     # Wrap main loop in a function to ease type stability
     init, rNorm, gNorm, rErr  = spglcore(init)
 

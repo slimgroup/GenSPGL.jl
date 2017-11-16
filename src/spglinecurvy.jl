@@ -132,8 +132,6 @@ function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,ETg<:Number, ETb<:Nu
 
     while true
 
-println("==============")
-println("step*scale: $(step*scale)")
         xNew, tmp_itr = project(x - step*scale*g, tau, timeProject, options, params)#GOOD
         tmp1::Array{ETb,1} = funForward(A, xNew, Array{ETx,1}(), params)[1]
         rNew::Array{ETb,1} = b - tmp1   #different from ml
@@ -150,12 +148,6 @@ println("step*scale: $(step*scale)")
             err = EXIT_NODESCENT
             break
         end
-println(@sprintf "fNew: %f" fNew)
-println(typeof(fNew))
-println("""
-fMax: $fMax
-Add: $(gamma*step*gts)
-""")
         if fNew < fMax + gamma*step*gts
             err = EXIT_CONVERGED
             break
@@ -166,9 +158,7 @@ Add: $(gamma*step*gts)
 
         #New linesearch iteration
         iter += 1
-    println("iter: $iter")
         step /= 2
-    println("step: $step")
 
         # Safeguard: If stepMax is huge, then even damped search
         # directions can give exactly the same point after projection.  If
@@ -178,17 +168,12 @@ Add: $(gamma*step*gts)
         sNormOld = copy(sNorm)
         sNorm = norm(s) / sqrt(n)
 
-    println("sNorm $sNorm")        
-    println(@sprintf "%f < %f" abs(sNorm - sNormOld) 1e-6*sNorm)
         if abs(sNorm - sNormOld) <= 1e-6*sNorm
             gNorm = norm(g) / sqrt(n)
-        println("gNorm: $gNorm")
             scale = sNorm/gNorm/(2^nSafe)
-        println("scale: $scale")
             nSafe+=1
         end
 
-println("/==============\n")
     end
 
     return fNew, xNew, rNew, iter, step, err, nProd 
