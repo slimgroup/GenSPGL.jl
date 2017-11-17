@@ -82,16 +82,17 @@ function spgline{TA<:Union{joAbstractLinearOperator, AbstractArray},
     return fNew, step, rNew, iter, err, localProdA
 
 end # spgline
+
 """
 Non-monotone linesearch
 """
 function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
                                         A::TA, 
                                         f::Tf,
-                                        d::AbstractVector{ETx},
-                                        gtd_in::ETx,
+                                        d::AbstractVector{<:Number},
+                                        gtd_in::Number,
                                         x::AbstractArray{ETx}, 
-                                        fMax::Tf, 
+                                        fMax::AbstractFloat, 
                                         funForward::Function,
                                         funPenalty::Function,
                                         params::Dict{String,Any},
@@ -119,8 +120,8 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
     end
     
     # Define outputs outside of while loop scope
-    rNew::Array{ETb,1} = Array{ETb,1}()
-    fNew::Tf = zero(Tf)
+    rNew = Array{ETb,1}()
+    fNew = zero(Tf)
     err = -1
 
     while true 

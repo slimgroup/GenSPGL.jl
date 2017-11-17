@@ -4,7 +4,6 @@ export jl_complex
 function jl_complex()
     exampledir = Pkg.dir("GenSPGL")*"/src/Examples/compare/"
     file = MAT.matopen(exampledir*"vars_complex.mat")
-
     b = read(file,"b")
     tau = read(file,"tau")
     test = read(file,"test")
@@ -40,11 +39,12 @@ function jl_complex()
 
     # Set threads and solve problems
     #BL.set_num_threads(8)
-    @time xLS_jl, r, g, info = spgl1(NLfunForward, vec(b), x = vec(xinit),
-                                                           tau = tau,
-                                                           sigma = sigma, 
-                                                           options = opts,
-                                                           params = params)
+    @time xLS_jl, r, g, info = spgl1(NLfunForward, vec(b),
+                                                   x = vec(xinit),
+                                                   tau = tau,
+                                                   sigma = sigma, 
+                                                   options = opts,
+                                                   params = params)
 
     # Write output for MATLAB comparison
     fw = MAT.matopen(exampledir*"xLS_jl.mat", "w")

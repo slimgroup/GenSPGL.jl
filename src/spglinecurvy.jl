@@ -103,7 +103,7 @@ function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,ETg<:Number, ETb<:Nu
                                     b::AbstractVector{ETb}, 
                                     project::Function,
                                     timeProject::Float64,
-                                    tau::Float64, 
+                                    tau::AbstractFloat, 
                                     options::spgOptions,
                                     params::Dict{String,Any})
 
@@ -133,8 +133,8 @@ function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,ETg<:Number, ETb<:Nu
     while true
 
         xNew, tmp_itr = project(x - step*scale*g, tau, timeProject, options, params)#GOOD
-        tmp1::Array{ETb,1} = funForward(A, xNew, Array{ETx,1}(), params)[1]
-        rNew::Array{ETb,1} = b - tmp1   #different from ml
+        tmp1 = funForward(A, xNew, Array{ETx,2}(), params)[1]
+        rNew = b - tmp1   #different from ml
     if false
         return rNew, xNew, b, x, g, step, scale, tau
     end

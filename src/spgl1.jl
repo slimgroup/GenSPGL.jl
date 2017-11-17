@@ -99,7 +99,7 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
     pivTol = 1e-12
 
     # Account for precision of data format in line search
-    if options.stepMin < eps(real(ETx))
+    if options.stepMin < 10*eps(real(ETx))
         options.stepMin = 10 * eps(real(ETx))
         warn("options.stepMin is below the precision of the data type. Setting to 10*eps(DT)")
     end
@@ -403,7 +403,7 @@ end
                             params::Dict{String,Any} = Dict{String,Any}())\n
 """
 function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
-                    x::AbstractVector{ETx}=Array{Tb,1}(),
+                    x::AbstractVector{ETx}=Array{ETb,1}(),
                     tau::AbstractFloat=NaN,
                     sigma::AbstractFloat=NaN,
                     options::spgOptions = spgOptions(),
