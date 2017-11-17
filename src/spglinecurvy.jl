@@ -133,7 +133,7 @@ function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,ETg<:Number, ETb<:Nu
     while true
 
         xNew, tmp_itr = project(x - step*scale*g, tau, timeProject, options, params)#GOOD
-        tmp1 = funForward(A, xNew, Array{ETx,2}(), params)[1]
+        tmp1 = funForward(A, xNew, Array{ETx,2}(0,0), params)[1]
         rNew = b - tmp1   #different from ml
     if false
         return rNew, xNew, b, x, g, step, scale, tau
