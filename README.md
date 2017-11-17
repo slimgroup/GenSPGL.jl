@@ -2,7 +2,7 @@
 
 A Julia solver for large scale minimization problems using any provided norm.
 GenSPGL supports implicit arrays(JOLI), explicit arrays, and functions as modelling
-operators **__A__**.
+operators (**__A__**).
 
 This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, and
 Aleksandr Aravkin's MATLAB program [SPGL1](http://www.cs.ubc.ca/~mpf/spgl1/).
