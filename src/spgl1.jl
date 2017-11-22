@@ -480,7 +480,7 @@ function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
     funForward = A
 
     if isempty(x)
-        x_tmp = funForward(A, x, -b) 
+        x_tmp = funForward(A, x, -b, params) 
         n = length(x_tmp)
         realx = isreal(x_tmp) & isreal(b)
 
