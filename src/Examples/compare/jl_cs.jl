@@ -24,7 +24,7 @@ function jl_cs()
     R = joRestriction(n,ind)
 
     # Create data
-    b = R*A*x0
+    b = R*F*x0
 
     # Solve
     opts = spgOptions(optTol = 1e-4,
