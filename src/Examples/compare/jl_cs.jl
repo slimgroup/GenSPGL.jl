@@ -16,12 +16,12 @@ function jl_cs()
     x0[p[1:k]] = sign.(randn(k))
 
     # Create a modelling op
-    F = joDFT(n)
+    F = joDCT(n)
     
     # Create a restriction op
     ind = randperm(n)
     ind = ind[1:Int(floor(0.6*n))]
-    R = joRestriction(n,ind)
+    R = joRestriction(n,ind, DDT = Float64, RDT = Float64)
 
     # Create data
     b = R*F*x0
