@@ -74,13 +74,13 @@ To run the example start a Julia instance, load the GenSPGL module, and run the 
         R = joRestriction(n,ind)
 
         # Create data
-        b = R*A*x0
+        b = R*F*x0
 
         # Solve
         opts = spgOptions(optTol = 1e-4,
                          verbosity = 1)
 
-        @time x, r, g, info = spgl1(R*A, vec(b), tau = 0., sigma = 1e-3, options = opts) 
+        @time x, r, g, info = spgl1(R*F, vec(b), tau = 0., sigma = 1e-3, options = opts) 
 
         # Calc SNR of recovery
         SNR = -20*log10(norm(x0-x)/norm(x0));
