@@ -165,7 +165,7 @@ function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, E
     # Quick exit if sigma >= ||b||. Set Tau = 0 to short circuit the loop
     if bNorm <= sigma
         println("W: sigma >= ||b||.  Exact solution is x = 0.")
-        tau = 0
+        tau = zero(real(ETb))
         singleTau = true
     end
 
