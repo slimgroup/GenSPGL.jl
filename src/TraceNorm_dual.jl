@@ -6,7 +6,6 @@ function TraceNorm_dual{ETx<:Number, Tx<:AbstractVector{ETx},
 
 numr::Int = params["numr"]
 numc::Int= params["numc"]
-nr::Int = params["nr"]
 E = reshape(x, numr, numc)
 
 #DEVNOTE# -Performance: Very expensive line
