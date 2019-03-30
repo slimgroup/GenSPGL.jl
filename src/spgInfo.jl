@@ -8,7 +8,7 @@ GenSPGL output vars composite type. \n
 
 Tip: Use print(ec::spgExitCondition) to display an exit status.
 """
-type spgInfo
+mutable struct spgInfo
    
     tau::Number
     rNorm::Number

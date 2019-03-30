@@ -7,7 +7,7 @@ export spgOptions
 GenSPGL input options composite type. 
 
 """
-type spgOptions
+mutable struct spgOptions
     fid::Integer
     verbosity::Integer
     iterations::Integer

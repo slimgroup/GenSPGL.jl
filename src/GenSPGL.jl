@@ -4,7 +4,7 @@ Julia port of MPF's SPGL1
 module GenSPGL
 
 # Modules
-using MAT, JOLI, JLD
+using Nullables, MAT, JLD, JOLI
 
 # Types
 include("spgOptions.jl")

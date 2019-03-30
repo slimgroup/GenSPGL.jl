@@ -3,7 +3,7 @@ import Base.print
 
 export spgExitCondition, print
 
-type spgExitCondition
+mutable struct spgExitCondition
     triggered::Nullable{Integer}
     conditions::Dict{Integer,String}
     info::Array{String,1}
