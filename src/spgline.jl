@@ -3,22 +3,22 @@ export spgline
 """
 Non-monotone linesearch
 """
-function spgline{TA<:Union{joAbstractLinearOperator, AbstractArray},
-                                        Tf<:Number, ETx<:Number, ETb<:Number}(
-                                        A::TA, 
-                                        f::Tf,
-                                        d::AbstractVector{<:Number},
-                                        gtd_in::Number,
-                                        x::AbstractArray{ETx}, 
-                                        fMax::Tf, 
-                                        funForward::Function,
-                                        funPenalty::Function,
-                                        params::Dict{String,Any},
-                                        b::AbstractVector{ETb}, 
-                                        feasSrchIt::Int64,
-                                        linear::Bool,
-                                        options::spgOptions,
-                                        timeProject::Float64)
+function spgline(A::TA,
+                 f::Tf,
+                 d::AbstractVector{<:Number},
+                 gtd_in::Number,
+                 x::AbstractArray{ETx},
+                 fMax::Tf,
+                 funForward::Function,
+                 funPenalty::Function,
+                 params::Dict{String,Any},
+                 b::AbstractVector{ETb},
+                 feasSrchIt::Int64,
+                 linear::Bool,
+                 options::spgOptions,
+                 timeProject::Float64) where
+                   {TA<:Union{joAbstractLinearOperator, AbstractArray},
+                    Tf<:Number, ETx<:Number, ETb<:Number}
 
     (options.verbosity > 1) && println("Script entered spgline for A::Function")
 
@@ -36,14 +36,14 @@ function spgline{TA<:Union{joAbstractLinearOperator, AbstractArray},
         localProdA += 1
         r = copy(x)
     end
-    
+
     # Define outputs outside of while loop scope
     rNew::Array{ETb,1} = Array{ETb,1}()
     fNew::Tf = zero(Tf)
     err = -1
 
-    while true 
-        
+    while true
+
         if linear
             rNew = r - step*Ad
         else
@@ -78,7 +78,7 @@ function spgline{TA<:Union{joAbstractLinearOperator, AbstractArray},
         end
 
     end # while
-    
+
     return fNew, step, rNew, iter, err, localProdA
 
 end # spgline
@@ -86,21 +86,21 @@ end # spgline
 """
 Non-monotone linesearch
 """
-function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
-                                        A::TA, 
-                                        f::Tf,
-                                        d::AbstractVector{<:Number},
-                                        gtd_in::Number,
-                                        x::AbstractArray{ETx}, 
-                                        fMax::AbstractFloat, 
-                                        funForward::Function,
-                                        funPenalty::Function,
-                                        params::Dict{String,Any},
-                                        b::AbstractVector{ETb}, 
-                                        feasSrchIt::Int64,
-                                        linear::Bool,
-                                        options::spgOptions,
-                                        timeProject::Float64)
+function spgline(A::TA,
+                 f::Tf,
+                 d::AbstractVector{<:Number},
+                 gtd_in::Number,
+                 x::AbstractArray{ETx},
+                 fMax::AbstractFloat,
+                 funForward::Function,
+                 funPenalty::Function,
+                 params::Dict{String,Any},
+                 b::AbstractVector{ETb},
+                 feasSrchIt::Int64,
+                 linear::Bool,
+                 options::spgOptions,
+                 timeProject::Float64) where
+                   {TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}
 
     (options.verbosity > 1) && println("Script entered spgline for A::Function")
 
@@ -118,14 +118,14 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
         localProdA += 1
         r = copy(x)
     end
-    
+
     # Define outputs outside of while loop scope
     rNew = Array{ETb,1}()
     fNew = zero(Tf)
     err = -1
 
-    while true 
-        
+    while true
+
         if linear
             rNew = r - step*Ad
         else
@@ -160,7 +160,7 @@ function spgline{TA<:Function, Tf<:Number, ETx<:Number, ETb<:Number}(
         end
 
     end # while
-    
+
     return fNew, step, rNew, iter, err, localProdA
 
 end # spgline

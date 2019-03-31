@@ -1,8 +1,6 @@
 export TraceNorm_dual
 
-function TraceNorm_dual{ETx<:Number, Tx<:AbstractVector{ETx},
-                        ETw<:Number, Tw<:AbstractArray{ETw}}(
-                        x::Tx, weights::Tw, params::Dict{String,Any})
+function TraceNorm_dual(x::Tx,weights::Tw, params::Dict{String,Any}) where {ETx<:Number, Tx<:AbstractVector{ETx}, ETw<:Number, Tw<:AbstractArray{ETw}}
 
 numr::Int = params["numr"]
 numc::Int= params["numc"]

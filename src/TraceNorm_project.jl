@@ -3,7 +3,7 @@ export TraceNorm_project
 """
 Force the rows of L and R to have norm at most B
 """
-function TraceNorm_project{ETx<:Number, Tx<:AbstractVector{ETx}}(x::Tx, B, weights, params::Dict{String,Any})
+function TraceNorm_project(x::Tx, B, weights, params::Dict{String,Any}) where {ETx<:Number, Tx<:AbstractVector{ETx}}
 
 if isapprox(norm(x), 0.0)
     warn("norm(x) cannot be 0 in TraceNorm_project")

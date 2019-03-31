@@ -5,10 +5,10 @@ export NormL1_primal
                     weights<:Union{AbstractVector, Number}, 
                     params::Dict{String, Any})
 """
-function NormL1_primal{Tw<:Union{AbstractVector, Number}, ETx<:Number}(
-                                    x::AbstractVector{ETx},
-                                    weights::Tw,
-                                    params::Dict{String, Any})
+function NormL1_primal(x::AbstractVector{ETx},
+                       weights::Tw,
+                       params::Dict{String, Any}) where
+                         {Tw<:Union{AbstractVector, Number}, ETx<:Number}
 
     d = norm(x.*weights, 1)
 

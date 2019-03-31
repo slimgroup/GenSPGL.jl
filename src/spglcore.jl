@@ -25,9 +25,9 @@ export spglcore
     This code is an adaptation of Michael P. Friedlander, Ewout van den Berg, 
     and Aleksandr Aravkin's MATLAB program SPGL1. 
 """
-function spglcore{TA<:Union{joAbstractLinearOperator, AbstractArray, Function},ETb<:Number,
-                    ETx<:Number, ETg<:Number, ETr<:Number, Tidx<:BitArray}(
-                    init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx})
+function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
+            {TA<:Union{joAbstractLinearOperator, AbstractArray, Function},
+             ETb<:Number, ETx<:Number, ETg<:Number, ETr<:Number, Tidx<:BitArray}
 
     #DEVNOTE# Create spgInit type to hold all these initialized paramaters
     
@@ -431,8 +431,8 @@ nnzG    is the number of elements in nnzIdx.
 nnzIdx  is a vector of primal/dual indicators.
 nnzDiff is the no. of elements that changed in the support.
 """
-function activevars{Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}(x::Txg,g::Txg,
-                        nnzIdx::Ti, options::spgOptions,params::Dict{String,Any})
+function activevars(x::Txg,g::Txg, nnzIdx::Ti, options::spgOptions,params::Dict{String,Any}) where
+            {Ti<:BitArray{1}, ETxg<:Number, Txg<:AbstractVector{ETxg}}
 
     xTol = min(.1,10*options.optTol)
     gTol = min(.1,10*options.optTol)

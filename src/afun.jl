@@ -1,6 +1,6 @@
 export afun
 
-function afun{ETx<:Number, Tx<:AbstractArray{ETx}}(x::Tx, params::Dict{String, Any})
+function afun(x::Tx, params::Dict{String, Any}) where {ETx<:Number, Tx<:AbstractArray{ETx}}
 
 if params["logical"] == 1
     xv = vec(x)

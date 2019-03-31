@@ -4,6 +4,7 @@ Julia port of MPF's SPGL1
 module GenSPGL
 
 # Modules
+using Printf
 using Nullables
 using LinearAlgebra
 using MAT

@@ -85,7 +85,7 @@ end
 oneprojectormex for scalar weight
 oneprojectormex_I clone
 """
-function oneprojectormex{T<:Number}(b::AbstractVector{T}, d::Number, tau::Number)
+function oneprojectormex(b::AbstractVector{T}, d::Number, tau::Number) where {T<:Number}
 
     tau = tau/abs.(d)
     len_b = length(b)

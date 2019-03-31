@@ -54,14 +54,14 @@ export spgl1, project, SpotFunForward, snr
     and Aleksandr Aravkin's MATLAB program SPGL1. 
 
 """
-function spgl1{TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, ETb<:Number}(
-                    A::TA,
-                    b::AbstractVector{ETb};
-                    x::AbstractVector{ETx}=Array{ETb,1}(),
-                    tau::AbstractFloat=NaN,
-                    sigma::AbstractFloat=NaN,
-                    options::spgOptions = spgOptions(),
-                    params::Dict{String,Any} = Dict{String,Any}())
+function spgl1(A::TA,
+               b::AbstractVector{ETb};
+               x::AbstractVector{ETx}=Array{ETb,1}(),
+               tau::AbstractFloat=NaN,
+               sigma::AbstractFloat=NaN,
+               options::spgOptions = spgOptions(),
+               params::Dict{String,Any} = Dict{String,Any}()) where
+                 {TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, ETb<:Number}
     
     REVISION = "0.1"
     DATE = "June, 2017"
@@ -335,8 +335,9 @@ end #func
 Use:    x = project(x::AbstractArray, tau::Number, timeProject::Float64
                     options::spgOptions, params::Dict)
 """
-function project{ETx<:Number, Tx<:AbstractVector{ETx}}(x::Tx, tau::Number, timeProject::Float64,
-                    options::spgOptions, params::Dict)
+function project(x::Tx, tau::Number, timeProject::Float64,
+                    options::spgOptions, params::Dict) where
+                      {ETx<:Number, Tx<:AbstractVector{ETx}}
     
     (options.verbosity > 1) && println("Begin Project")
 
@@ -357,13 +358,13 @@ GenSPGL
 
 Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
 """
-function funCompositeR{TA<:Union{joAbstractLinearOperator,AbstractArray}}(
-                        A::TA,
-                        x::AbstractArray,
-                        r::AbstractArray,
-                        funForward::Function, funPenalty::Function, 
-                        nProdAt::Int64,
-                        params::Dict{String,Any})
+function funCompositeR(A::TA,
+                       x::AbstractArray,
+                       r::AbstractArray,
+                       funForward::Function, funPenalty::Function, 
+                       nProdAt::Int64,
+                       params::Dict{String,Any}) where
+                         {TA<:Union{joAbstractLinearOperator,AbstractArray}}
 
     nProdAt += one(Int64)
     f,v = funPenalty(r, params)
@@ -383,7 +384,8 @@ end
 """
 Activated when an explicit or JOLI operator is passed in.
 """
-function SpotFunForward{TA<:Union{joAbstractLinearOperator,AbstractArray}}(A::TA, x::AbstractArray, g::AbstractArray, params::Dict)
+function SpotFunForward(A::TA, x::AbstractArray, g::AbstractArray, params::Dict) where
+                       {TA<:Union{joAbstractLinearOperator,AbstractArray}}
     #DEVNOTE# Double check type of g once in use
 
     isempty(g) && (f = A*x)
@@ -402,12 +404,13 @@ end
                             options::spgOptions = spgOptions(),
                             params::Dict{String,Any} = Dict{String,Any}())\n
 """
-function spgl1{ETx<:Number, ETb<:Number}(A::Function, b::AbstractVector{ETb};
-                    x::AbstractVector{ETx}=Array{ETb,1}(),
-                    tau::AbstractFloat=NaN,
-                    sigma::AbstractFloat=NaN,
-                    options::spgOptions = spgOptions(),
-                    params::Dict{String,Any} = Dict{String,Any}())
+function spgl1(A::Function, b::AbstractVector{ETb};
+               x::AbstractVector{ETx}=Array{ETb,1}(),
+               tau::AbstractFloat=NaN,
+               sigma::AbstractFloat=NaN,
+               options::spgOptions = spgOptions(),
+               params::Dict{String,Any} = Dict{String,Any}()) where
+                  {ETx<:Number, ETb<:Number}
     
     REVISION = "0.1"
     DATE = "June, 2017"

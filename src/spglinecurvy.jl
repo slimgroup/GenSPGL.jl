@@ -3,25 +3,22 @@ export spglinecurvy
 """
 Use: fNew,xNew,rNew,iter,step,err, nProd = spglinecurvy(x,g,fMax,funForward, funPenalty, b,project,tau, params)\n
 Projected backtracking linesearch. On entry, g is the (possibly scaled) steepest
-descent direction. 
+descent direction.
 """
-function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
-                                                        Tf<:Number,
-                                                        ETx<:Number,
-                                                        ETg<:Number,
-                                                        ETb<:Number}(
-                                    A::TA, 
-                                    x::AbstractArray{ETx}, 
-                                    g::AbstractArray{ETg}, 
-                                    fMax::Tf, 
-                                    funForward::Function,
-                                    funPenalty::Function,
-                                    b::AbstractVector{ETb}, 
-                                    project::Function,
-                                    timeProject::Float64,
-                                    tau::AbstractFloat,
-                                    options::spgOptions,
-                                    params::Dict{String,Any})
+function spglinecurvy(A::TA,
+                      x::AbstractArray{ETx},
+                      g::AbstractArray{ETg},
+                      fMax::Tf,
+                      funForward::Function,
+                      funPenalty::Function,
+                      b::AbstractVector{ETb},
+                      project::Function,
+                      timeProject::Float64,
+                      tau::AbstractFloat,
+                      options::spgOptions,
+                      params::Dict{String,Any}) where
+                        {TA<:Union{joAbstractLinearOperator, AbstractArray},
+                         Tf<:Number, ETx<:Number, ETg<:Number, ETb<:Number}
 
     (options.verbosity > 1) && println("Script entered spglinecurvy for A::AbstractArray")
 
@@ -81,7 +78,7 @@ function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
 
         sNormOld = sNorm
         sNorm = norm(s) / sqrt(n)
-        
+
         if abs(sNorm - sNormOld) <= 1e-6*sNorm
             gNorm = norm(g) / sqrt(n)
             scale = sNorm/gNorm/(2^nSafe)
@@ -90,22 +87,23 @@ function spglinecurvy{TA<:Union{joAbstractLinearOperator, AbstractArray},
 
     end
 
-    return fNew, xNew, rNew, iter, step, err, nProd 
+    return fNew, xNew, rNew, iter, step, err, nProd
 end
 
-function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,ETg<:Number, ETb<:Number}(
-                                    A::TA, 
-                                    x::AbstractArray{ETx}, 
-                                    g::AbstractArray{ETg}, 
-                                    fMax::Tf, 
-                                    funForward::Function,
-                                    funPenalty::Function,
-                                    b::AbstractVector{ETb}, 
-                                    project::Function,
-                                    timeProject::Float64,
-                                    tau::AbstractFloat, 
-                                    options::spgOptions,
-                                    params::Dict{String,Any})
+function spglinecurvy(A::TA,
+                      x::AbstractArray{ETx},
+                      g::AbstractArray{ETg},
+                      fMax::Tf,
+                      funForward::Function,
+                      funPenalty::Function,
+                      b::AbstractVector{ETb},
+                      project::Function,
+                      timeProject::Float64,
+                      tau::AbstractFloat,
+                      options::spgOptions,
+                      params::Dict{String,Any}) where
+                        {TA<:Function, Tf<:Number,
+                         ETx<:Number,ETg<:Number, ETb<:Number}
 
     (options.verbosity > 1) && println("Script entered spglinecurvy for A::Function")
 
@@ -176,6 +174,6 @@ function spglinecurvy{TA<:Function, Tf<:Number, ETx<:Number,ETg<:Number, ETb<:Nu
 
     end
 
-    return fNew, xNew, rNew, iter, step, err, nProd 
+    return fNew, xNew, rNew, iter, step, err, nProd
 end
 
