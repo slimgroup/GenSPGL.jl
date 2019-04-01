@@ -69,7 +69,7 @@ function oneprojector(b::AbstractArray, d, tau::AbstractFloat)
     else
         
         d_abs = abs.(d)
-        idx = find(d .> eps())
+        idx = findall(d .> eps())
         x = deepcopy(b_abs) 
         x[idx],itn = oneprojectormex(b_abs[idx], d[idx], tau)
     end

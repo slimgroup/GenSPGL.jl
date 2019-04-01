@@ -23,7 +23,7 @@ For Complex
 function NormL1_project(x::AbstractVector{<:Complex}, tau::Number, weights, params)
 
     xa = abs.(x)
-    idx = find(xa .< eps())
+    idx = findall(xa .< eps())
     xc,itn = oneprojector(xa, weights, tau)
     xc = xc ./ xa
     xc[idx] = 0
