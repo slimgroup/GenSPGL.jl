@@ -71,7 +71,7 @@ function spgl1(A::TA,
     (options.verbosity > 1) && println("Script made it to spgl1 for A::AbstractArray")
 
 
-    tic()
+    # removed for 0.7+ #tic()
     m = length(b)
 
     #Add options proxy to params dict
@@ -420,7 +420,7 @@ function spgl1(A::Function, b::AbstractVector{ETb};
     (options.verbosity > 1) && println("Script made it to spgl1 for A::Function")
 
 
-    tic()
+    # removed for 0.7+ #tic()
     m = length(b)
 
     #Add options proxy to params dict
