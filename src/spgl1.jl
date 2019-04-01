@@ -694,4 +694,4 @@ function funCompositeR(A::Function,x::AbstractArray,r::AbstractArray,
     return f,g1,g2
 end
 
-snr(raw,interp) = -20log10(vecnorm(interp-raw)/vecnorm(raw))
+snr(raw,interp) = -20log10(norm(interp-raw)/norm(raw))
