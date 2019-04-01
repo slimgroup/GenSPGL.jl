@@ -101,7 +101,7 @@ function spgl1(A::TA,
     # Account for precision of data format in line search
     if options.stepMin < 10*eps(real(ETx))
         options.stepMin = 10 * eps(real(ETx))
-        warn("options.stepMin is below the precision of the data type. Setting to 10*eps(DT)")
+        println("WARNING: options.stepMin is below the precision of the data type. Setting to 10*eps(DT)")
     end
 
     ##--------------------------------------------------------------------------------
@@ -450,7 +450,7 @@ function spgl1(A::Function, b::AbstractVector{ETb};
     # Account for precision of data format in line search
     if options.stepMin < eps(real(ETx))
         options.stepMin = 10 * eps(real(ETx))
-        warn("options.stepMin is below the precision of the data type. Setting to 10*eps(DT)")
+        println("WARNING: options.stepMin is below the precision of the data type. Setting to 10*eps(DT)")
     end
 
     ##--------------------------------------------------------------------------------

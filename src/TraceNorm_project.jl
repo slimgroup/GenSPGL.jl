@@ -6,7 +6,7 @@ Force the rows of L and R to have norm at most B
 function TraceNorm_project(x::Tx, B, weights, params::Dict{String,Any}) where {ETx<:Number, Tx<:AbstractVector{ETx}}
 
 if isapprox(norm(x), 0.0)
-    warn("norm(x) cannot be 0 in TraceNorm_project")
+    println("WARNING: norm(x) cannot be 0 in TraceNorm_project")
 end
   
 c = sqrt(B/(0.5*norm(x).^2))

@@ -144,7 +144,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
 
             if init.testUpdateTau
                 
-                (options.verbosity > 1) && warn("Update Tau")
+                (options.verbosity > 1) && println("WARNING: Update Tau")
                 if (options.quitPareto & (init.iter >= options.minPareto)) 
                     init.exit_status.triggered = 10
                 end
@@ -156,7 +156,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
                 init.printTau = (abs(tauOld - init.tau) >= (1e-6 * init.tau)) 
 
                 if init.tau < tauOld
-                    (options.verbosity > 1) && warn("Tau Decreasing")
+                    (options.verbosity > 1) && println("WARNING: Tau Decreasing")
                     init.x, tmp_itn = project(init.x, init.tau, init.timeProject, options, params)
 
                 end
@@ -247,7 +247,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
             init.nProdA += localProdA
             
             if lnErr == -1
-                warn("Line Search Error not set in call to spglinecurvy")
+                println("WARNING: Line Search Error not set in call to spglinecurvy")
             end
 
             # If an error was triggered in the line search
@@ -320,7 +320,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
             # Failed again, Revert to Previous iterates and damp max BB step
             if (lnErr !== 0)
                 options.stepMax /= 10
-                warn("Line Search Failed. Line Error: $(lnErr)") #DEVNOTE# Include more info
+                println("WARNING Line Search Failed. Line Error: $(lnErr)") #DEVNOTE# Include more info
             end
 
 
@@ -335,7 +335,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
             if options.ignorePErr
 
                 if primNorm_x > targetNorm
-                    warn("Primal norm of projected x is larger than expected")
+                    println("WARNING: Primal norm of projected x is larger than expected")
                 end
                 
             end
