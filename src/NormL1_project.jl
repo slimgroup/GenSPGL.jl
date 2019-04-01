@@ -26,7 +26,7 @@ function NormL1_project(x::AbstractVector{<:Complex}, tau::Number, weights, para
     idx = findall(xa .< eps())
     xc,itn = oneprojector(xa, weights, tau)
     xc = xc ./ xa
-    xc[idx] = 0
+    xc[idx] .= 0
     x_out = x.*xc 
     
     return x_out,itn

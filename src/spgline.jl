@@ -45,7 +45,7 @@ function spgline(A::TA,
     while true
 
         if linear
-            rNew = r - step*Ad
+            rNew = r .- step*Ad
         else
             rNew = b - funForward(A, x + step*d, Array{ETx,1}(), params)[1]
             localProdA += 1
