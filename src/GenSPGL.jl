@@ -9,6 +9,7 @@ using Nullables
 using LinearAlgebra
 using MAT
 using JLD
+using Arpack
 using JOLI
 
 # Types

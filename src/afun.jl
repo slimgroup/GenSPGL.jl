@@ -9,7 +9,7 @@ if params["logical"] == 1
 else
     xv = vec(x)
     Ind = params["Ind"]
-    xv[Ind] = zero(ETx)
+    xv[Ind] .= zero(ETx)
 end
 
 return xv
