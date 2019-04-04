@@ -27,7 +27,7 @@ If you have a Github account and installed SSH keys, run the following from the 
 
 Otherwise run: 
 
-    Pkg.add(PackageSpec(url="https://github.com/slimgroup/GenSPGL1.jl.git",rev="v07-devel"))
+    Pkg.add(PackageSpec(url="https://github.com/slimgroup/GenSPGL.jl.git",rev="v07-devel"))
 
 ## Examples
 
