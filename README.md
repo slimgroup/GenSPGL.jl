@@ -23,11 +23,11 @@ GenSPGL requires the JOLI package. If it isn't already installed run the followi
 GenSPGL can be installed using the Julia package manager.
 If you have a Github account and installed SSH keys, run the following from the Julia REPL:
 
-    Pkg.add(PackageSpec(url="git@github.com:slimgroup/GenSPGL.jl.git",rev="v07-devel"))
+    Pkg.add(PackageSpec(url="git@github.com:slimgroup/GenSPGL.jl.git",rev="master"))
 
 Otherwise run: 
 
-    Pkg.add(PackageSpec(url="https://github.com/slimgroup/GenSPGL.jl.git",rev="v07-devel"))
+    Pkg.add(PackageSpec(url="https://github.com/slimgroup/GenSPGL.jl.git",rev="master"))
 
 ## Examples
 
