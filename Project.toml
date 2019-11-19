@@ -1,7 +1,7 @@
 name = "GenSPGL"
 uuid = "46767539-6b09-4d43-90af-09e8ecbe3fb9"
 authors = ["Henryk Modzelewski <henryk_modzelewski@mac.com>"]
-version = "0.7.0"
+version = "0.7.1"
 
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"

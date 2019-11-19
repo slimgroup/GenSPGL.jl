@@ -372,7 +372,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
             """)
             println("ERROR: ", exc) 
 
-            display(catch_stacktrace())
+            display(stacktrace(catch_backtrace()))
 
             println("""
             ================================================================================ 
