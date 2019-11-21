@@ -37,6 +37,10 @@ include("afun.jl")
 # Penalties
 include("Penalty/funLS.jl")
 
+# Composite
+include("Composite/funCompR1.jl")
+include("Composite/funCompR2.jl")
+
 # Examples
 #include("Examples/spgdemo.jl")
 include("Examples/compare/jl_cs.jl")

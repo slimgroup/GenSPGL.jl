@@ -237,12 +237,12 @@ function spgl1(A::TA,
         
         #DEVNOTE# Why copy? Waste of mem and time. Check if b is used again
         r = deepcopy(b) 
-        f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
+        f,g,g2 = options.funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
     else
         x,itn = project(x,tau, timeProject, options, params)
         r = b - funForward(A, x, [], params)
         nProdA += 1
-        f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
+        f,g,g2 = options.funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
         dx_tmp, itn_tmp = project(x-g, tau, timeProject, options, params)
         dx = dx_tmp - x
         itn += itn_tmp
@@ -349,34 +349,6 @@ function project(x::Tx, tau::Number, timeProject::Float64,
     
     return x_out, itn
 
-end
-
-
-
-"""
-GenSPGL
-
-Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
-"""
-function funCompositeR(A::TA,
-                       x::AbstractArray,
-                       r::AbstractArray,
-                       funForward::Function, funPenalty::Function, 
-                       nProdAt::Int64,
-                       params::Dict{String,Any}) where
-                         {TA<:Union{joAbstractLinearOperator,AbstractArray}}
-
-    nProdAt += one(Int64)
-    f,v = funPenalty(r, params)
-    
-    if ~(params["proxy"])
-        g1 = funForward(A, x, -v, params)
-        g2 = [zero(eltype(g1))]
-    else
-        g1,g2 = funForward(A, x, -v, params)
-    end
-
-    return f,g1,g2
 end
 
 
@@ -580,12 +552,12 @@ function spgl1(A::Function, b::AbstractVector{ETb};
         
         #DEVNOTE# Why copy? Waste of mem and time. Check if b is used again
         r = deepcopy(b) 
-        f,g,g2 = funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
+        f,g,g2 = options.funCompositeR(A, x, r, funForward, options.funPenalty, timeMatProd, nProdAt)
     else
         x,itn = project(x,tau, timeProject, options, params)
         r = b - funForward(A, x, Array{ETx,1}(), params)[1]
         nProdA += 1
-        f,g,g2 = funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
+        f,g,g2 = options.funCompositeR(A, x,r, funForward, options.funPenalty, nProdAt, params)
         dx_tmp, itn_tmp = project(x-g, tau, timeProject, options, params)
         dx = dx_tmp - x
         itn += itn_tmp
@@ -671,27 +643,5 @@ function spgl1(A::Function, b::AbstractVector{ETb};
     return init.x, init.r, init.g, info
 end #func
 
-"""
-GenSPGL
-
-Use:    f,g1,g2 = funCompositeR(A, r, funForward, funPenalty, params)
-"""
-function funCompositeR(A::Function,x::AbstractArray,r::AbstractArray,
-                        funForward::Function, funPenalty::Function, 
-                        nProdAt::Int64,
-                        params::Dict{String,Any})
-
-    nProdAt += one(Int64)
-    f,v = funPenalty(r, params)
-    
-    if ~(params["proxy"])
-        g1 = funForward(A, x, -v, params)
-        g2 = zero(eltype(g1))
-    else
-        g1,g2 = funForward(A, x, -v, params)
-    end
-
-    return f,g1,g2
-end
 
 snr(raw,interp) = -20log10(norm(interp-raw)/norm(raw))

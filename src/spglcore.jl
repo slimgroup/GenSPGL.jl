@@ -345,7 +345,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
             gOld = copy(init.g) 
 
 
-            init.f, init.g, init.g2 = funCompositeR(init.A, init.x, init.r, init.funForward,
+            init.f, init.g, init.g2 = options.funCompositeR(init.A, init.x, init.r, init.funForward,
             options.funPenalty, init.nProdAt, params)
 
             # xOld plays the role of s
@@ -402,7 +402,7 @@ function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
             (options.verbosity > 1) && println("Restoring best iterate to objective: $(rNorm)")
             init.x = init.xBest
             init.r = init.b - init.funForward(init.A, init.x, Array{ETx,1}(), params)
-            init.f, init. g, init.g2 = funCompositeR(init.A, init.x, init.r, init.funForward,
+            init.f, init. g, init.g2 = options.funCompositeR(init.A, init.x, init.r, init.funForward,
                                             options.funPenalty, init.nProdAt, params)
             if options.proxy
                 gNorm = options.dual_norm(init.g2, options.weights)

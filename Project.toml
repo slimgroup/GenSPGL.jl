@@ -1,7 +1,7 @@
 name = "GenSPGL"
 uuid = "46767539-6b09-4d43-90af-09e8ecbe3fb9"
 authors = ["Henryk Modzelewski <henryk_modzelewski@mac.com>"]
-version = "0.7.1"
+version = "0.7.2"
 
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
@@ -11,6 +11,7 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
 Nullables = "4d1e1d77-625e-5b40-9113-a560ec7a8ecd"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 julia = ">= 0.7"

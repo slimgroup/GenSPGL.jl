@@ -33,6 +33,7 @@ mutable struct spgOptions
     primal_norm::Function
     dual_norm::Function
     funPenalty::Function 
+    funCompositeR::Function
     proxy::Bool # Appropriate type?
     linear::Bool # ^
     restore::Bool # ^^
@@ -80,6 +81,7 @@ Arguments not specified will be set to their default values shown below.\n
                     primal_norm = dummyfun,
                     dual_norm = NormL1_dual,
                     funPenalty = funLS,
+                    funCompositeR = funCompR1,
                     proxy = false,
                     linear = false,
                     restore = false)
@@ -157,6 +159,7 @@ function spgOptions(;fid::Integer = 1,
                         primal_norm::Function = GenSPGL.NormL1_primal,
                         dual_norm::Function = GenSPGL.NormL1_dual,
                         funPenalty::Function = GenSPGL.funLS,
+                        funCompositeR::Function = GenSPGL.funCompR1,
                         proxy::Bool = false,
                         linear::Bool = false,
                         restore::Bool = false)
@@ -187,6 +190,7 @@ function spgOptions(;fid::Integer = 1,
                         primal_norm,
                         dual_norm,
                         funPenalty,
+                        funCompositeR,
                         proxy,
                         linear,
                         restore)
