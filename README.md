@@ -26,10 +26,9 @@ First switch to package manager prompt (using ']') and add SLIM registry:
 	registry add https://github.com/slimgroup/SLIMregistryJL.git
 ```
 
-Then still from package manager prompt add JOLI:
+Then still from package manager prompt add GenSPGL:
 
 ```
-	add JOLI
 	add GenSPGL
 ```
 
