@@ -9,25 +9,38 @@ Aleksandr Aravkin's MATLAB program [SPGL1](http://www.cs.ubc.ca/~mpf/spgl1/).
 
 Please note that while it is largely based off of SPGL1, this package is NOT a direct port of SPGL1. Various changes have been made to generalize the solver and make it more applicable to SLIM's research on large datasets. 
 
-Noteable changes include: 
+Notable changes include: 
 * **__A__** can be non-linear
 * L1 and L2 projections
 * Nuclear or L1 norms and their corresponding dual norms
 
 ## Installation
 
-GenSPGL requires the JOLI package. If it isn't already installed run the following from the Julia REPL:
+GenSPGL requires the JOLI package, and the instructions below will add JOLI as well. Skip the lines adding JOLI if you already have it installed.
 
-    Pkg.add(PackageSpec(url="https://github.com/slimgroup/JOLI.jl.git",rev="master"))
+### Using SLIM Registry (preferred method) ###
 
-GenSPGL can be installed using the Julia package manager.
-If you have a Github account and installed SSH keys, run the following from the Julia REPL:
+First switch to package manager prompt (using ']') and add SLIM registry:
 
-    Pkg.add(PackageSpec(url="git@github.com:slimgroup/GenSPGL.jl.git",rev="master"))
+```
+	registry add https://github.com/slimgroup/SLIMregistryJL.git
+```
 
-Otherwise run: 
+Then still from package manager prompt add JOLI:
 
-    Pkg.add(PackageSpec(url="https://github.com/slimgroup/GenSPGL.jl.git",rev="master"))
+```
+	add JOLI
+	add GenSPGL
+```
+
+### Adding without SLIM registry ###
+
+After switching to package manager prompt (using ']') type:
+
+```
+	add https://github.com/slimgroup/JOLI.jl.git
+	add https://github.com/slimgroup/GenSPGL.jl.git
+```
 
 ## Examples
 
