@@ -17,8 +17,7 @@ function spglinecurvy(A::TA,
                       tau::AbstractFloat,
                       options::spgOptions,
                       params::Dict{String,Any}) where
-                        {TA<:Union{joAbstractLinearOperator, AbstractArray},
-                         Tf<:Number, ETx<:Number, ETg<:Number, ETb<:Number}
+                        {TA<:InType, Tf<:Number, ETx<:Number, ETg<:Number, ETb<:Number}
 
     (options.verbosity > 1) && println("Script entered spglinecurvy for A::AbstractArray")
 

@@ -61,7 +61,7 @@ function spgl1(A::TA,
                sigma::AbstractFloat=NaN,
                options::spgOptions = spgOptions(),
                params::Dict{String,Any} = Dict{String,Any}()) where
-                 {TA<:Union{joAbstractLinearOperator,AbstractArray}, ETx<:Number, ETb<:Number}
+                 {TA<:InType, ETx<:Number, ETb<:Number}
     
     REVISION = "0.1"
     DATE = "June, 2017"
@@ -357,7 +357,7 @@ end
 Activated when an explicit or JOLI operator is passed in.
 """
 function SpotFunForward(A::TA, x::AbstractArray, g::AbstractArray, params::Dict) where
-                       {TA<:Union{joAbstractLinearOperator,AbstractArray}}
+                       {TA<:InType}
     #DEVNOTE# Double check type of g once in use
 
     isempty(g) && (f = A*x)

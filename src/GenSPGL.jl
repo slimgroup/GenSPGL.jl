@@ -10,7 +10,17 @@ using LinearAlgebra
 using MAT
 using JLD
 using Arpack
-using JOLI
+using Requires
+
+const InTypeF = Union{AbstractArray, Function}
+const InType = Union{AbstractArray}
+
+function __init__()
+    @require JOLI = "bb331ad6-a1cf-11e9-23da-9bcb53c69f6f"
+    @eval using JOLI
+    global const InTypeF = Union{joAbstractLinearOperator, AbstractArray, Function}
+    global const InType = Union{joAbstractLinearOperator, AbstractArray}
+end
 
 # Types
 include("spgOptions.jl")

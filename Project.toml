@@ -6,7 +6,6 @@ version = "0.7.2"
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
 JLD = "4138dd39-2aa7-5051-a626-17a0bb65d9c8"
-JOLI = "bb331ad6-a1cf-11e9-23da-9bcb53c69f6f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
 Nullables = "4d1e1d77-625e-5b40-9113-a560ec7a8ecd"
