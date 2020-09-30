@@ -26,7 +26,7 @@ export spglcore
     and Aleksandr Aravkin's MATLAB program SPGL1. 
 """
 function spglcore(init::spgInit{TA, ETb, ETx, ETg, ETr, Tidx}) where
-            {TA<:Union{joAbstractLinearOperator, AbstractArray, Function},
+            {TA<:InTypeF,
              ETb<:Number, ETx<:Number, ETg<:Number, ETr<:Number, Tidx<:BitArray}
 
     #DEVNOTE# Create spgInit type to hold all these initialized paramaters

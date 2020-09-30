@@ -10,8 +10,7 @@ function funCompR1(A::TA,
                        r::AbstractArray,
                        funForward::Function, funPenalty::Function, 
                        nProdAt::Int64,
-                       params::Dict{String,Any}) where
-                         {TA<:Union{joAbstractLinearOperator,AbstractArray,Function}}
+                       params::Dict{String,Any}) where {TA<:InTypeF}
 
     nProdAt += one(Int64)
     f,v = funPenalty(r, params)
