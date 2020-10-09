@@ -39,12 +39,12 @@ mutable struct spgInit{TA<:Union{joAbstractLinearOperator,AbstractArray, Functio
     nNewton::Int64
     printTau::Bool
     subspace::Bool
-    stepG::Float64
-    xNorm1::Vector{Float64}
-    rNorm2::Vector{Float64}
+    stepG::ETx
+    xNorm1::Vector{ETx}
+    rNorm2::Vector{ETb}
     lambda::Vector{Float64}
     lastFv::Vector{Float64} # Has to be Float64 to support Inf
-    gStep::Float64
+    gStep::ETx
     funForward::Function
     nLineTot::Int64
     nProdAt::Int64
