@@ -120,7 +120,7 @@ function spgl1(A::TA,
     nnzIter = zero(Int64) # No. of Its with fixed pattern
     nnzIdx = BitArray{1}()  # Active set indicator
     subspace = false        # Flag if did subspace min in current itn
-    stepG = 1.0               # Step length for projected gradient
+    stepG = ETx(1.0)               # Step length for projected gradient
     testUpdateTau = false
 
     ##-------------------------------------------------------------------------------
@@ -179,8 +179,8 @@ function spgl1(A::TA,
     #DEVNOTE# Once these are being updated check to see if type should be inferred
             # from promotion rules
     # Pre-Allocate iteration info vectors
-    xNorm1 = zeros(Float64, min(options.iterations,10000))
-    rNorm2 = zeros(Float64, min(options.iterations,10000))
+    xNorm1 = zeros(ETx, min(options.iterations,10000))
+    rNorm2 = zeros(ETb, min(options.iterations,10000))
     lambda = zeros(Float64, min(options.iterations,10000))
 
     # Create ExitCondition with null trigger
@@ -250,9 +250,9 @@ function spgl1(A::TA,
        
     dxNorm = norm(dx,Inf)
     if dxNorm < (1/options.stepMax)
-        gStep = options.stepMax
+        gStep = ETx(options.stepMax)
     else
-        gStep = min(options.stepMax, max(options.stepMin, 1/dxNorm))
+        gStep = ETx(min(options.stepMax, max(options.stepMin, 1/dxNorm)))
     end
 
     # Required for non-monotone strategy
@@ -441,7 +441,7 @@ function spgl1(A::Function, b::AbstractVector{ETb};
     nnzIter = zero(Int64) # No. of Its with fixed pattern
     nnzIdx = BitArray{1}()  # Active set indicator
     subspace = false        # Flag if did subspace min in current itn
-    stepG = 1.0               # Step length for projected gradient
+    stepG = ETx(1.0)               # Step length for projected gradient
     testUpdateTau = false
 
     ##-------------------------------------------------------------------------------
@@ -494,8 +494,8 @@ function spgl1(A::Function, b::AbstractVector{ETb};
     #DEVNOTE# Once these are being updated check to see if type should be inferred
             # from promotion rules
     # Pre-Allocate iteration info vectors
-    xNorm1 = zeros(Float64, min(options.iterations,10000))
-    rNorm2 = zeros(Float64, min(options.iterations,10000))
+    xNorm1 = zeros(ETx, min(options.iterations,10000))
+    rNorm2 = zeros(ETb, min(options.iterations,10000))
     lambda = zeros(Float64, min(options.iterations,10000))
 
     # Create ExitCondition with null trigger
@@ -565,9 +565,9 @@ function spgl1(A::Function, b::AbstractVector{ETb};
 
     dxNorm = norm(dx,Inf)
     if dxNorm < (1/options.stepMax)
-        gStep = options.stepMax
+        gStep = ETx(options.stepMax)
     else
-        gStep = min(options.stepMax, max(options.stepMin, 1/dxNorm))
+        gStep = ETx(min(options.stepMax, max(options.stepMin, 1/dxNorm)))
     end
 
     # Required for non-monotone strategy
